@@ -11,6 +11,7 @@ Goal
 ----
 
 Building a working quadrocopter for not too much money with the following features:
+
 *   gyros and accelerometers to fly the thing
 *   magnetometer to compensate drift in yaw axis
 *   barometer for holding position (height)
@@ -19,6 +20,7 @@ Building a working quadrocopter for not too much money with the following featur
 *   Voltage divider to check the battery voltage
 
 Future features:
+
 *  GPS for position hold
 *  ultrasonic/distance sensors for automatic landing and calibrating the barometer
 *  camera for FPV-flights
