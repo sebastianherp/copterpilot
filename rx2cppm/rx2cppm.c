@@ -3,24 +3,25 @@
 #include "rx2cppm.h"
 #include "delays.h"
 
-void high_isr (void); 
-unsigned char count; 
+void high_isr (void);
+void update_channel(char chan, int value); 
+
 
 #define CHANNELS 8
-#define PPM_ADJ 66
+#define PPM_ADJ 62
 #define PPM_BREAK 235 //300ms = 300 - 65
 #define PPM_FRAMELENGTH 22500
 #define PPM_MINSTARTFRAME 5000
 
-char counter = 0;
 char ppm_on = 0;
+char counter = 0;
 unsigned int framelength = 0;
 unsigned int channels[CHANNELS];
 volatile unsigned int values[CHANNELS];
 
-unsigned int timer = 0, timer2;
+unsigned int timer = 0, timer2 = 0;
 unsigned char test = 0, prev = 0, diff = 0;
-char i, c = 0;
+char i;
 
 //ISR................... 
 #pragma code high_vector=0x08 
@@ -38,13 +39,14 @@ void high_isr (void)
 			PORTBbits.RB4 = 1;
 			if(counter == CHANNELS) {
 				// start frame
-				framelength = 0;
+				/*framelength = 0;
 				for(i=0;i<CHANNELS;i++)
 					framelength += values[i];
 				framelength -= PPM_ADJ*CHANNELS;
 				framelength = PPM_FRAMELENGTH - framelength;
 				if(framelength < PPM_MINSTARTFRAME)
-					framelength = PPM_MINSTARTFRAME;
+				*/
+				framelength = PPM_MINSTARTFRAME;
 
 				// 10 ms break;
 				TMR0H = 255 - (framelength / 256);
@@ -68,12 +70,63 @@ void high_isr (void)
 
 		INTCONbits.TMR0IF = 0;
 	}
-  if(PIR1bits.TMR1IF) 
-    { 
-      count++; 
-      PIR1bits.TMR1IF = 0;              //clears flag 
-          
-    }
+	/*
+  	if(PIR1bits.TMR1IF) 
+    {
+		PIR1bits.TMR1IF = 0;              //clears flag 
+    }*/
+	timer = TMR1L + TMR1H * 256;
+	if(INTCONbits.INT0IF)
+	{
+		
+		if(INTCON2bits.INTEDG0) {
+			INTCON2bits.INTEDG0 = 0;
+			channels[0] = timer;
+		} else {
+			INTCON2bits.INTEDG0 = 1;
+			update_channel(0, timer - channels[0]);
+		}
+		INTCONbits.INT0IF = 0;
+	}
+
+	if(INTCON3bits.INT1IF)
+	{
+		//timer = TMR1L + TMR1H * 256;
+		if(INTCON2bits.INTEDG1) {
+			INTCON2bits.INTEDG1 = 0;
+			channels[1] = timer;
+		} else {
+			INTCON2bits.INTEDG1 = 1;
+			update_channel(1, timer - channels[1]);
+		}
+		INTCON3bits.INT1IF = 0;
+	}
+
+	if(INTCON3bits.INT2IF)
+	{
+		//timer = TMR1L + TMR1H * 256;
+		if(INTCON2bits.INTEDG2) {
+			INTCON2bits.INTEDG2 = 0;
+			channels[2] = timer;
+		} else {
+			INTCON2bits.INTEDG2 = 1;
+			update_channel(2, timer - channels[2]);
+		}
+		INTCON3bits.INT2IF = 0;
+	}
+
+	if(INTCON3bits.INT3IF)
+	{
+		//timer = TMR1L + TMR1H * 256;
+		if(INTCON2bits.INTEDG3) {
+			INTCON2bits.INTEDG3 = 0;
+			channels[3] = timer;
+		} else {
+			INTCON2bits.INTEDG3 = 1;
+			update_channel(3, timer - channels[3]);
+		}
+		INTCON3bits.INT3IF = 0;
+	}
 } 
 
 void setup(void) {
@@ -91,7 +144,7 @@ void setup(void) {
 	//T1CON = 0b10000001;
 	T1CONbits.TMR1CS = 0;                     //INTERNAL CLOCK (Fosc/4) 
 	PIR1bits.TMR1IF = 0; 
-	PIE1bits.TMR1IE = 1;                              // ENABLES TIMER1 INTERRUPT 
+	PIE1bits.TMR1IE = 0;                              // ENABLES TIMER1 INTERRUPT 
 	T1CONbits.T1CKPS1 = 0; 
 	T1CONbits.T1CKPS0 = 1;                    //PRESCALAR 1:1, DIVIDE THE FREQ. TO 8 
 	T1CONbits.TMR1ON = 1; 
@@ -106,20 +159,49 @@ void setup(void) {
 	T0CONbits.T0PS0 = 0;
 	T0CONbits.TMR0ON = 1;
 
+	INTCON2bits.INTEDG0 = 1;		// rising edge
+	INTCONbits.INT0IF = 0;
+	INTCONbits.INT0IE = 1;
+	
+	INTCON2bits.INTEDG1 = 1;
+	INTCON3bits.INT1IF = 0;
+	INTCON3bits.INT1IE = 1;
+
+	INTCON2bits.INTEDG2 = 1;
+	INTCON3bits.INT2IF = 0;
+	INTCON3bits.INT2IE = 1;
+
+	INTCON2bits.INTEDG3 = 1;
+	INTCON3bits.INT3IF = 0;
+	INTCON3bits.INT3IE = 1;
+
 	INTCONbits.GIE = 1;                              //enable interrupts 
 	INTCONbits.PEIE = 1;                           //ENABLE PERIPHERAL INTERRUPTS 
 	
-	values[0] = 1050;
-	values[1] = 1450;
-	values[2] = 1850;
-	values[3] = 1234;
-	values[4] = 756;
-	values[5] = 2000;
-	values[6] = 1050;
-	values[7] = 1888;
+	update_channel(0, 1050);
+	update_channel(1, 1450);
+	update_channel(2, 1850);
+	update_channel(3, 1234);
+	update_channel(4, 756);
+	update_channel(5, 2000);
+	update_channel(6, 1050);
+	update_channel(7, 1888);
 }
 
-
+void update_channel(char chan, int value) {
+	if(value < 0)
+		values[chan] = value + 65536;
+	else
+		values[chan] = value;
+/*
+	if(chan < CHANNELS && value < 2000 && value > 700) {
+		//if(chan > 3 && values[chan] > value + 50)
+		//	values[chan] = (values[chan]*19 + value) /20;
+		//else
+			values[chan] = value;
+	}
+*/
+}
 
 void main(void)
 {
@@ -128,30 +210,39 @@ void main(void)
 	prev = 0;
 	diff = 0;
 
+/*
 	while(1) {
-		test = (PORTA << 4) + (PORTB & 0xF);
+		test = PORTAbits.RA2;
+		timer2 = TMR1L + TMR1H * 256;
+		if(!prev && test) {
+			channels[4] = timer2;
+		} else if(prev && !test) {
+			update_channel(4, timer2 - channels[4]);
+		}
+		prev = test;
+	} */
+
+	while(1) {
+		test = (PORTA>>2 & 0b00000011) + (PORTB << 2 & 0b00001100);
  		diff = test ^ prev;
+
+		timer2 = TMR1L + TMR1H * 256;
+		//for(i=0;i<CHANNELS;i++) {
+		i = 4;
+		while(diff > 0) {
+			if(diff & 1) {
+				if(test >> (i-4) & 1) {
+					channels[i] = timer2;
+				} else  {
+					update_channel(i, timer2 - channels[i]);
+				}
+			}
+			diff = diff >> 1;
+			//test = test >> 1;
+			i++;
+		}
 		prev = test;
 
-		if(diff > 0) {
-			timer = TMR1L + TMR1H * 256;
-			//for(i=0;i<CHANNELS;i++) {
-			i = 0;
-			while(diff > 0) {
-				if(diff & 1) {
-					if(test & 1) {
-						channels[i] = timer;
-					} else  {
-						values[i] = timer - channels[i];
-					}
-				}
-				diff = diff >> 1;
-				test = test >> 1;
-				i++;
-			}
-			timer2 = TMR1L + TMR1H * 256 - timer;
-		} //if
-		
 		
 	}
 }
