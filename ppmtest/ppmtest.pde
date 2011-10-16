@@ -2,16 +2,24 @@
 void setup()
 {
     Serial.begin(57600);
-    pinMode(4, OUTPUT);
-    digitalWrite(4, HIGH);
-    pinMode(5, INPUT);
+    pinMode(2, INPUT);
     
 }
 
-unsigned long duration = 0;
+unsigned long duration[8];
+unsigned long duration2 = 0;
 
 void loop()
 {
-    duration = pulseIn(5, HIGH);
-    Serial.println(duration);
+    while(pulseIn(2, HIGH) < 4000) {}
+
+    for(int i=0;i<8;i++) {
+      duration[i] = pulseIn(2, HIGH);
+      
+    }
+    for(int i=0;i<8;i++) {
+      Serial.print(duration[i]);
+      Serial.print(" ");
+    }
+    Serial.println("");
 }
