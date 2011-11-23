@@ -6,21 +6,29 @@ Copyright (C) 2011 Sebastian Herp
 #include "WProgram.h"
 #include "Receiver.h"
 
-Receiver::Receiver() {
-
+Receiver::Receiver(int pin) {
+	_pin = pin;
+	rx_channel = 0;
+	rx_duration = 0;
 }
 
 void Receiver::init() {
-	rx_channel = 0;
-	rx_duration = 0;
-	
-    pinMode(2, INPUT);
-	
-	rx_values[0] = 1234;
+	TCCR1A = 0; // normal counting mode
+    TCCR1B = 0 | (1<<CS11); // | (1<<CS10); // prescaler :8
+
+    pinMode(_pin, INPUT);
+	for(byte channel = 0; channel < LASTCHANNEL; channel++) {
+		rx_values[channel] = 1000;
+	}
 }
 
+unsigned int Receiver::get(char channel) {
+	return rx_values[channel];
+}
+
+
 void Receiver::update() {
-   if(digitalRead(2)) {
+   if(digitalRead(_pin)) {
      rx_start = TCNT1;
    } else {
      rx_duration = TCNT1 - rx_start;

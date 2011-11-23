@@ -8,15 +8,23 @@ Copyright (C) 2011 Sebastian Herp
 #ifndef Receiver_h
 #define Receiver_h
 
+#define THROTTLE 2
+#define YAW 3
+#define ROLL 1
+#define PITCH 0
+#define LASTCHANNEL 8
+
 class Receiver
 {
 public:
-    Receiver();
-    void init();
+    Receiver(int pin);
+	void init();
     void update();  
- 	volatile unsigned int rx_values[8];   
+	unsigned int get(char channel);
+	volatile unsigned int rx_values[LASTCHANNEL];
 	
 private:
+	int _pin;
 	char rx_channel;
 	unsigned int rx_start;
 	unsigned int rx_duration;
