@@ -10,6 +10,13 @@
 #include <Motors.h>
 
 
+#define BAUD 115200
+#define BUZZER_PIN 9
+#define RECEIVER_PIN 2
+#define MOTOR_PINS 4,5,6,7
+
+#define ON 1
+#define OFF 0
 
 #define BEEPER_ON false
 
@@ -17,23 +24,19 @@ char output[20];
 
 FreeIMU myIMU = FreeIMU();
 Battery bat = Battery();
-Motors motors = Motors(4, 5, 6, 7);
-Receiver receiver = Receiver(2); // pin 2
+Motors motors = Motors(MOTOR_PINS);
+Receiver receiver = Receiver(RECEIVER_PIN); // pin 2
 //LED led = LED();
+
+
+byte armed = OFF;
+byte safetyCheck = OFF;
 
 
 float quat[4];
 float angles[3];
 float angles2[3] = {0.0, 0.0, 0.0};
 float time_diff;
-float scale_factor;
-
-
-
-
-
-
-
 
 unsigned long timer_now;
 unsigned long timer_old;
@@ -49,32 +52,28 @@ void receiver_update() {
   receiver.update(); 
 }
 
+
+/**
+* Setup Quadrocopter
+*/
 void setup()
 {
-   
-    bat.init();
-    
-    motors.init();
-    
-    // Receiver stuff
-    receiver.init();
-    attachInterrupt(0, receiver_update, CHANGE);
-  
-    motors.set(FRONT, 2000);
-    motors.set(REAR, 2200);    
-    motors.set(LEFT, 2300);
-    motors.set(RIGHT, 2400);
-    
-    Serial.begin(28800); 
-    
+    Serial.begin(BAUD); 
     Wire.begin();
 
-    delay(5);
+    // initialize motors
+    motors.init();
+    
+    // initialize receiver
+    receiver.init();
+    attachInterrupt(0, receiver_update, CHANGE);
+    
+    // initialize sensors
     myIMU.init();
-    delay(5);
-    
-    scale_factor = 180000000.0 / (myIMU.g_scale.x * PI);
-    
+
+    // battery measurements
+    bat.init();
+  
     timer_old = micros();
     timer_counter = 0;
     
@@ -98,42 +97,22 @@ void loop()
       timer_counter++;
       timer_old += 5000;
         
-      if(timer_counter % 2 == 0) { // 200Hz
+      if(timer_counter % 2 == 0) { // 100Hz
         myIMU.update();
         myIMU.getYawPitchRoll(angles);
         //myIMU.getQ(quat);
+        
+        if(armed == ON) {
+          motors.set(FRONT, receiver.get(THROTTLE));
+          motors.set(REAR, receiver.get(THROTTLE));    
+          motors.set(LEFT, receiver.get(THROTTLE));
+          motors.set(RIGHT, receiver.get(THROTTLE));
+        }
       }
       
-      if(timer_counter % 50 == 0) { // 1Hz
-     
-        //TODO: flight commands
-        Serial.print(timer_now / 1000);
-        Serial.print(", ");        
-        Serial.print(digitalRead(2));
-        Serial.print(", ");        
-        Serial.print(bat.voltage);
-        Serial.print("V, ");        
-        Serial.print(bat.ampere);
-        Serial.print("A, "); 
-        Serial.print(bat.ampere_hours, 0);
-        Serial.print("mAh, "); 
-        Serial.print(receiver.get(0));
-        Serial.print(", ");
-        Serial.print(receiver.get(1));
-        Serial.print(", ");
-        Serial.print(receiver.get(2));
-        Serial.print(", ");
-        Serial.print(receiver.get(3));
-        Serial.print("| ");
-        Serial.print(motors.get(FRONT));
-        Serial.print(", ");
-        Serial.print(motors.get(RIGHT));
-        Serial.print(", ");
-        Serial.print(motors.get(BACK));
-        Serial.print(", ");
-        Serial.print(motors.get(LEFT));
-        Serial.println("");          
-
+      if(timer_counter % 4 == 0) { // 50Hz
+        processInput();
+      
       }
       
       if(timer_counter % 20 == 0) { // 10Hz
@@ -144,8 +123,7 @@ void loop()
         else
           noTone(9);
         
-        //PrintSensors();
-  
+        telemetry();
       }
 
       
@@ -156,6 +134,54 @@ void loop()
     }
 }
 
+void telemetry() {
+    Serial.print(timer_now / 1000);
+    Serial.print(", ");        
+    Serial.print(digitalRead(2));
+    Serial.print(", ");        
+    Serial.print(bat.voltage);
+    Serial.print("V, ");        
+    Serial.print(bat.ampere);
+    Serial.print("A, "); 
+    Serial.print(bat.ampere_hours, 0);
+    Serial.print("mAh, "); 
+    Serial.print(receiver.get(0));
+    Serial.print(", ");
+    Serial.print(receiver.get(1));
+    Serial.print(", ");
+    Serial.print(receiver.get(2));
+    Serial.print(", ");
+    Serial.print(receiver.get(3));
+    Serial.print("| ");
+    Serial.print(motors.get(FRONT));
+    Serial.print(", ");
+    Serial.print(motors.get(RIGHT));
+    Serial.print(", ");
+    Serial.print(motors.get(REAR));
+    Serial.print(", ");
+    Serial.print(motors.get(LEFT));
+    Serial.println(""); 
+}
 
-
+void processInput() {
+  if(receiver.get(THROTTLE) < RX_LOW) {
+    
+    // disarm motors if left stick in lower left corner
+    if(receiver.get(YAW) < RX_LOW && armed == ON) {
+      armed = OFF;
+      motors.setAll(MOTOR_OFF);
+    }
+    
+    // TODO: calibration
+    
+    // arm motors if left stick in lower right corner
+    if(receiver.get(YAW) > RX_HIGH && armed == OFF && safetyCheck == ON) {
+      armed = ON;
+      motors.setAll(MOTOR_ON);
+    }
+    
+    if(receiver.get(YAW) > RX_LOW) safetyCheck = ON;
+  }
+  
+}
 

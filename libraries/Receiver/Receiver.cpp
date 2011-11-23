@@ -26,7 +26,9 @@ unsigned int Receiver::get(char channel) {
 	return rx_values[channel];
 }
 
-
+/***
+* normal values are between 2000 and 4000 (1000 us - 2000 us)
+*/
 void Receiver::update() {
    if(digitalRead(_pin)) {
      rx_start = TCNT1;

@@ -14,6 +14,11 @@ Copyright (C) 2011 Sebastian Herp
 #define REAR 3
 #define LASTMOTOR 4
 
+#define MOTOR_LOW 2000
+#define MOTOR_HIGH 4000
+#define MOTOR_OFF 200
+#define MOTOR_ON MOTOR_LOW + 200
+
 class Motors
 {
 public:
@@ -22,6 +27,7 @@ public:
 	void handleInterrupt();
 	unsigned int get(char motor);
 	void set(char motor, unsigned int value);
+	void setAll(unsigned int value);
 	
 private:
 	int _pin1, _pin2, _pin3, _pin4;

@@ -17,12 +17,7 @@ Motors::Motors(int pin1, int pin2, int pin3, int pin4) {
     pinMode(_pin3, OUTPUT);
     pinMode(_pin4, OUTPUT);
 	
-	for(byte motor = 0; motor < LASTMOTOR; motor++) {
-		motor_values[motor] = 0;
-	}
-	
-
-	
+	setAll(MOTOR_OFF);
 }
 
 void Motors::init() {
@@ -38,6 +33,12 @@ unsigned int Motors::get(char motor) {
 
 void Motors::set(char motor, unsigned int value) {
 	motor_values[motor] = value;
+}
+
+void Motors::setAll(unsigned int value) {
+	for(byte motor = 0; motor < LASTMOTOR; motor++) {
+		motor_values[motor] = value;
+	}
 }
 
 void Motors::handleInterrupt() {

@@ -14,6 +14,9 @@ Copyright (C) 2011 Sebastian Herp
 #define PITCH 0
 #define LASTCHANNEL 8
 
+#define RX_LOW 2200
+#define RX_HIGH 3800
+
 class Receiver
 {
 public:
