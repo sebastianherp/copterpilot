@@ -13,6 +13,7 @@ class LSM303DLH
 	
 		LSM303DLH();
 		void init(void);
+		void reset(void);
 		void read(void);
 		int heading(void);
 		int heading(vector from);

@@ -27,8 +27,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //----------------------------------------------------------------------------------------------------
 // Definitions
 
-#define Kp 2.0f   // proportional gain governs rate of convergence to accelerometer/magnetometer
-#define Ki 0.005f   // integral gain governs rate of convergence of gyroscope biases
+#define KpAcc 0.0 //2.0f   // proportional gain governs rate of convergence to accelerometer/magnetometer
+#define KiAcc 0.0 //0.0005f   // integral gain governs rate of convergence of gyroscope biases
+
+#define KpMag 0.0 //2.0f   // proportional gain governs rate of convergence to accelerometer/magnetometer
+#define KiMag 0.0 //0.005f   // integral gain governs rate of convergence of gyroscope biases
+
 //#define halfT 0.02f   // half the sample period
 
 
@@ -47,14 +51,7 @@ FreeIMU::FreeIMU() {
 	ezInt = 0.0;
 	lastUpdate = 0;
 	now = 0;
-
-	m_max.x = 100;
-	m_max.y = 100;
-	m_max.z = 100;
-  
-  	g_bias.x = -245;
-	g_bias.y = -260;
-	g_bias.z = 130;
+	
 }
 
 void FreeIMU::init() {
@@ -80,7 +77,7 @@ void FreeIMU::init(bool fastmode) {
   imu.init();
   // calibrate the IMU3000
   // TODO: imu.zeroCalibrate(64,5);
-  zeroCalibrateGyro(64,5);
+  zeroCalibrateGyro(164,5);
   
 }
 
@@ -106,25 +103,17 @@ void FreeIMU::zeroCalibrateGyro(unsigned int totSamples, unsigned int sampleDela
   g_bias.y = -tmpOffsets[1] / totSamples;
   g_bias.z = -tmpOffsets[2] / totSamples;
   
-  g_scale.x = 0.00121414; //0.874745;
-  g_scale.y = 0.00121414;
-  g_scale.z = 0.00121414;
+  g_scale.x = 2000.0 / 32768.0 * PI / 180.0;
+  g_scale.y = 2000.0 / 32768.0 * PI / 180.0;
+  g_scale.z = 2000.0 / 32768.0 * PI / 180.0;
 }
 
 void FreeIMU::update() {  
   imu.read();
-  baro.read();
-  magn.read();
+  //baro.read();
+  //magn.read();
   
-  //update magnometer maxima
-  if (magn.m.x > m_max.x) m_max.x = magn.m.x;
-  if (magn.m.y > m_max.y) m_max.y = magn.m.y;
-  if (magn.m.z > m_max.z) m_max.z = magn.m.z;  
-
-  if (magn.m.x < m_min.x) m_min.x = magn.m.x;
-  if (magn.m.y < m_min.y) m_min.y = magn.m.y;
-  if (magn.m.z < m_min.z) m_min.z = magn.m.z;  
-  
+ 
 }
 
 float FreeIMU::maxOfVector(vector v) {
@@ -166,8 +155,8 @@ float FreeIMU::maxOfVector(vector v) {
 void FreeIMU::AHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz) {
   float norm;
   float hx, hy, hz, bx, bz;
-  float vx, vy, vz, wx, wy, wz;
-  float ex, ey, ez;
+  float exAcc, eyAcc, ezAcc;
+  float exMag, eyMag, ezMag;
 
   // auxiliary variables to reduce number of repeated operations
   float q0q0 = q0*q0;
@@ -183,8 +172,8 @@ void FreeIMU::AHRSupdate(float gx, float gy, float gz, float ax, float ay, float
   
   // normalise the measurements
   
-  now = millis();
-  halfT = (now - lastUpdate) / 2000.0;
+  now = micros();
+  halfT = (now - lastUpdate) / 2000000.0;
   lastUpdate = now;
   
   norm = sqrt(ax*ax + ay*ay + az*az);       
@@ -227,25 +216,29 @@ void FreeIMU::AHRSupdate(float gx, float gy, float gz, float ax, float ay, float
   wz = 2*bx*(q0q2 + q1q3) + 2*bz*(0.5 - q1q1 - q2q2);  
   
   // error is sum of cross product between reference direction of fields and direction measured by sensors
-  ex = (ay*vz - az*vy) + (my*wz - mz*wy);
-  ey = (az*vx - ax*vz) + (mz*wx - mx*wz);
-  ez = (ax*vy - ay*vx) + (mx*wy - my*wx);
+  exAcc = (ay*vz - az*vy);
+  eyAcc = (az*vx - ax*vz);
+  ezAcc = (ax*vy - ay*vx); 
+  
+  exMag = (my*wz - mz*wy);
+  eyMag = (mz*wx - mx*wz);
+  ezMag = (mx*wy - my*wx);
   
   // integral error scaled integral gain
-  exInt = exInt + ex*Ki;
-  eyInt = eyInt + ey*Ki;
-  ezInt = ezInt + ez*Ki;
+  exInt = exInt + exAcc*KiAcc + exMag*KiMag;
+  eyInt = eyInt + eyAcc*KiAcc + eyMag*KiMag;
+  ezInt = ezInt + ezAcc*KiAcc + ezMag*KiMag;
   
   // adjusted gyroscope measurements
-  gx = gx + Kp*ex + exInt;
-  gy = gy + Kp*ey + eyInt;
-  gz = gz + Kp*ez + ezInt;
+  gxAdj = gx + KpAcc*exAcc + KpMag*exMag + exInt;
+  gyAdj = gy + KpAcc*eyAcc + KpMag*eyMag + eyInt;
+  gzAdj = gz + KpAcc*ezAcc + KpMag*ezMag + ezInt;
   
   // integrate quaternion rate and normalise
-  iq0 = (-q1*gx - q2*gy - q3*gz)*halfT;
-  iq1 = (q0*gx + q2*gz - q3*gy)*halfT;
-  iq2 = (q0*gy - q1*gz + q3*gx)*halfT;
-  iq3 = (q0*gz + q1*gy - q2*gx)*halfT;  
+  iq0 = (-q1*gxAdj - q2*gyAdj - q3*gzAdj)*halfT;
+  iq1 = (q0*gxAdj + q2*gzAdj - q3*gyAdj)*halfT;
+  iq2 = (q0*gyAdj - q1*gzAdj + q3*gxAdj)*halfT;
+  iq3 = (q0*gzAdj + q1*gyAdj - q2*gxAdj)*halfT;  
   
   q0 += iq0;
   q1 += iq1;
@@ -282,12 +275,12 @@ void FreeIMU::getQ(float * q) {
   float ax = imu.a.x;
   float ay = imu.a.y;
   float az = imu.a.z;
-  float mx = (magn.m.x - m_min.x);
-  mx = mx / (m_max.x - m_min.x) * 2 - 1.0;
-  float my = (magn.m.y - m_min.y);
-  my = my / (m_max.y - m_min.y) * 2 - 1.0;
-  float mz = (magn.m.z - m_min.z);
-  mz = mz / (m_max.z - m_min.z) * 2 - 1.0;
+  float mx = (magn.m.x - magn.m_min.x);
+  mx = mx / (magn.m_max.x - magn.m_min.x) * 2 - 1.0;
+  float my = (magn.m.y - magn.m_min.y);
+  my = my / (magn.m_max.y - magn.m_min.y) * 2 - 1.0;
+  float mz = (magn.m.z - magn.m_min.z);
+  mz = mz / (magn.m_max.z - magn.m_min.z) * 2 - 1.0;
   
   AHRSupdate(gx, gy, gz, ax, ay, az, magn.m.x, magn.m.y, magn.m.z);
 

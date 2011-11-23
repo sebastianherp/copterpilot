@@ -55,11 +55,10 @@
 
 LSM303DLH::LSM303DLH()
 {
-	// These are just some values for a particular unit, it is recommended that
-	// a calibration be done for your particular unit.
-	m_max.x = +540; m_max.y = +500; m_max.z = 180;
-	m_min.x = -520; m_min.y = -570; m_min.z = -770;
+	reset();
 }
+
+
 
 // Public Methods //////////////////////////////////////////////////////////////
 
@@ -82,6 +81,15 @@ void LSM303DLH::init(void)
 	// Continuous conversion mode
 	Wire.send(0x00);
 	Wire.endTransmission();
+}
+
+void LSM303DLH::reset(void)
+{
+	// These are just some values for a particular unit, it is recommended that
+	// a calibration be done for your particular unit.
+	m_max.x = +100; m_max.y = +100; m_max.z = 100;
+	m_min.x = -100; m_min.y = -100; m_min.z = -100;
+
 }
 
 // Reads all 6 channels of the LSM303DLH and stores them in the object variables
@@ -126,6 +134,20 @@ void LSM303DLH::read()
 	m.x = (xhm << 8 | xlm);
 	m.y = (yhm << 8 | ylm);
 	m.z = (zhm << 8 | zlm);
+	
+	//update magnometer maxima
+	if (m.x > m_max.x) m_max.x = m.x;
+	if (m.y > m_max.y) m_max.y = m.y;
+	if (m.z > m_max.z) m_max.z = m.z;  
+
+	if (m.x < m_min.x) m_min.x = m.x;
+	if (m.y < m_min.y) m_min.y = m.y;
+	if (m.z < m_min.z) m_min.z = m.z;
+	
+	// shift and scale
+	m.x = (m.x - m_min.x) / (m_max.x - m_min.x) * 2 - 1.0;
+    m.y = (m.y - m_min.y) / (m_max.y - m_min.y) * 2 - 1.0;
+    m.z = (m.z - m_min.z) / (m_max.z - m_min.z) * 2 - 1.0;
 }
 
 // Returns the number of degrees from the -Y axis that it
@@ -139,11 +161,6 @@ int LSM303DLH::heading()
 // is pointing.
 int LSM303DLH::heading(vector from)
 {
-	// shift and scale
-    m.x = (m.x - m_min.x) / (m_max.x - m_min.x) * 2 - 1.0;
-    m.y = (m.y - m_min.y) / (m_max.y - m_min.y) * 2 - 1.0;
-    m.z = (m.z - m_min.z) / (m_max.z - m_min.z) * 2 - 1.0;
-
 	vector temp_a = a;
     // normalize
     vector_normalize(&temp_a);

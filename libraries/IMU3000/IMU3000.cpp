@@ -21,7 +21,7 @@ void IMU3000::init() {
 	writeTo(IMUGYRO, 0x15, 0x09);  
 	// Sample Rate 1kHz, Filter Bandwidth 42Hz, Gyro Range 500 d/s
 	// 0x0B = 500 d/s, 0x03 = 250 d/s, 0x13 = 1000 d/s, 0x1B = 2000 d/s
-	writeTo(IMUGYRO, 0x16, 0x0B);       
+	writeTo(IMUGYRO, 0x16, 0x1B);       
 	//set accel register data address
 	writeTo(IMUGYRO, 0x18, 0x32);     
 	// set accel i2c slave address

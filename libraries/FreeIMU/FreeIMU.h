@@ -43,29 +43,29 @@ class FreeIMU
     void getQ(float * q);
     void getEuler(float * angles);
     void getYawPitchRoll(float * ypr);
+	void zeroCalibrateGyro(unsigned int totSamples, unsigned int sampleDelayMS);
     
 	BMP085 baro;
     LSM303DLH magn;
     IMU3000 imu;
-
-	vector m_max;
-	vector m_min;
+	
+  float vx, vy, vz, wx, wy, wz;
     vector g_bias;
 	vector g_scale;
+	float gxAdj, gyAdj, gzAdj;
+    float q0, q1, q2, q3; // quaternion elements representing the estimated orientation
 	
   private:
     int* raw_acc, raw_gyro, raw_magn;
     void AHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz);
-    float q0, q1, q2, q3; // quaternion elements representing the estimated orientation
     float iq0, iq1, iq2, iq3;
     float exInt, eyInt, ezInt;  // scaled integral error
-    int lastUpdate, now; // sample period expressed in milliseconds
+    long lastUpdate, now; // sample period expressed in milliseconds
     float halfT; // half the sample period expressed in seconds
     int startLoopTime;
 	
 	float maxOfVector(vector v);
 	
-	void zeroCalibrateGyro(unsigned int totSamples, unsigned int sampleDelayMS);
 };
 
 float invSqrt(float number);
