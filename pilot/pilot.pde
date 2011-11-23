@@ -1,5 +1,6 @@
 #include <Wire.h>
 #include <SPI.h>
+#include "pilot.h"
 #include <IMU3000.h>
 #include <BMP085.h>
 #include <LSM303DLH.h>
@@ -18,6 +19,9 @@
 #define ON 1
 #define OFF 0
 
+#define ACRO 0
+#define STABLE 1
+
 #define BEEPER_ON false
 
 char output[20];
@@ -32,10 +36,8 @@ Receiver receiver = Receiver(RECEIVER_PIN); // pin 2
 byte armed = OFF;
 byte safetyCheck = OFF;
 
-
 float quat[4];
-float angles[3];
-float angles2[3] = {0.0, 0.0, 0.0};
+float ypr[3];
 float time_diff;
 
 unsigned long timer_now;
@@ -99,15 +101,11 @@ void loop()
         
       if(timer_counter % 2 == 0) { // 100Hz
         myIMU.update();
-        myIMU.getYawPitchRoll(angles);
+        myIMU.getYawPitchRoll(ypr);
         //myIMU.getQ(quat);
         
-        if(armed == ON) {
-          motors.set(FRONT, receiver.get(THROTTLE));
-          motors.set(REAR, receiver.get(THROTTLE));    
-          motors.set(LEFT, receiver.get(THROTTLE));
-          motors.set(RIGHT, receiver.get(THROTTLE));
-        }
+        adjustMotors();
+
       }
       
       if(timer_counter % 4 == 0) { // 50Hz
@@ -137,7 +135,7 @@ void loop()
 void telemetry() {
     Serial.print(timer_now / 1000);
     Serial.print(", ");        
-    Serial.print(digitalRead(2));
+    Serial.print(freemem());
     Serial.print(", ");        
     Serial.print(bat.voltage);
     Serial.print("V, ");        
@@ -145,13 +143,13 @@ void telemetry() {
     Serial.print("A, "); 
     Serial.print(bat.ampere_hours, 0);
     Serial.print("mAh, "); 
-    Serial.print(receiver.get(0));
+    Serial.print(motors.getCalculated(FRONT));
     Serial.print(", ");
-    Serial.print(receiver.get(1));
+    Serial.print(motors.getCalculated(RIGHT));
     Serial.print(", ");
-    Serial.print(receiver.get(2));
+    Serial.print(motors.getCalculated(REAR));
     Serial.print(", ");
-    Serial.print(receiver.get(3));
+    Serial.print(motors.getCalculated(LEFT));
     Serial.print("| ");
     Serial.print(motors.get(FRONT));
     Serial.print(", ");
@@ -161,6 +159,29 @@ void telemetry() {
     Serial.print(", ");
     Serial.print(motors.get(LEFT));
     Serial.println(""); 
+}
+
+
+void adjustMotors() {
+  adjustMotorsPlus();
+  
+}
+
+/**
+* fly in plus configuration
+*/
+void adjustMotorsPlus() {
+  
+  motors.setYaw(receiver.get(YAW));
+  motors.setThrottle(receiver.get(THROTTLE));
+  motors.setRoll(receiver.get(ROLL));
+  motors.setPitch(receiver.get(PITCH));
+  
+  motors.process(ypr);
+  if(armed == ON && safetyCheck == ON) {
+    motors.write();
+  }
+  
 }
 
 void processInput() {

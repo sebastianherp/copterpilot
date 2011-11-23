@@ -17,7 +17,15 @@ Motors::Motors(int pin1, int pin2, int pin3, int pin4) {
     pinMode(_pin3, OUTPUT);
     pinMode(_pin4, OUTPUT);
 	
-	setAll(MOTOR_OFF);
+	_throttle = _yaw = _pitch = _roll = 0;
+	
+	for(byte motor = 0; motor < LASTMOTOR; motor++) {
+		motor_values[motor] = MOTOR_OFF;
+		motor_calculated_values[motor] = MOTOR_OFF;
+		motor_min_values[motor] = MOTOR_LOW;
+		motor_max_values[motor] = MOTOR_HIGH;
+	}
+	
 }
 
 void Motors::init() {
@@ -27,12 +35,27 @@ void Motors::init() {
 
 }
 
-unsigned int Motors::get(char motor) {
-	return motor_values[motor];
+
+// calculate motor output
+void Motors::process(float * ypr) {
+	// roll & pitch
+	// calc motor change motor_calculated_values[ROLL] = _roll - ypr[0];
+
+	_yaw = _yaw - 3000;
+	_roll = _roll - 3000;
+	_pitch = _pitch - 3000;
+	
+	motor_calculated_values[FRONT] = _throttle + _pitch + _yaw;
+	motor_calculated_values[REAR] = _throttle - _pitch + _yaw;
+	motor_calculated_values[LEFT] = _throttle + _roll - _yaw;
+	motor_calculated_values[RIGHT] = _throttle - _roll - _yaw;
 }
 
-void Motors::set(char motor, unsigned int value) {
-	motor_values[motor] = value;
+// write motor output
+void Motors::write() {
+	for(byte motor = 0; motor < LASTMOTOR; motor++) {
+		motor_values[motor] = motor_calculated_values[motor];
+	}
 }
 
 void Motors::setAll(unsigned int value) {
