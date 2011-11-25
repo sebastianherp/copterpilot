@@ -32,7 +32,6 @@ void Motors::init() {
 	TCCR1A = 0; // normal counting mode
     TCCR1B = 0 | (1<<CS11); // | (1<<CS10); // prescaler :8
     TIMSK1 |= (1<<OCIE1A); // Enable CTC interrupt  
-
 }
 
 
@@ -65,7 +64,8 @@ void Motors::setAll(unsigned int value) {
 }
 
 void Motors::handleInterrupt() {
-	state = 0;
+	static uint8_t state = 0;
+	static uint8_t count = 0;
 	if (state == 0) {
 		//http://billgrundmann.wordpress.com/2009/03/03/to-use-or-not-use-writedigital/
 		bitWrite(PORTD, 4, 1);

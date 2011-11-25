@@ -10,6 +10,7 @@
 #include <LED.h>
 #include <Motors.h>
 
+#define VERSION 213
 
 #define BAUD 115200
 #define BUZZER_PIN 9
@@ -40,14 +41,15 @@ float quat[4];
 float ypr[3];
 float time_diff;
 
-unsigned long timer_now;
+unsigned long timer_now = 0;
 unsigned long timer_old;
 unsigned long timer_diff;
 int timer_counter;
 
+unsigned int cycleTime = 0;
 
 ISR(TIMER1_COMPA_vect) {
-    //motors.handleInterrupt();
+    motors.handleInterrupt();
 }
 
 void receiver_update() {
@@ -89,6 +91,7 @@ unsigned long countme = 0;
 
 void loop()
 {
+    cycleTime = micros() - timer_now;
     timer_now = micros();
     timer_diff = timer_now - timer_old;
 
@@ -121,7 +124,8 @@ void loop()
         else
           noTone(9);
         
-        telemetry();
+        serialCom();
+        //telemetry();
       }
 
       
@@ -143,6 +147,18 @@ void telemetry() {
     Serial.print("A, "); 
     Serial.print(bat.ampere_hours, 0);
     Serial.print("mAh, "); 
+    Serial.print(myIMU.imu.a.x);
+    Serial.print(", ");
+    Serial.print(myIMU.imu.a.y);
+    Serial.print(", ");
+    Serial.print(myIMU.imu.a.z);
+    Serial.print("| ");
+    Serial.print(myIMU.imu.g.x);
+    Serial.print(", ");
+    Serial.print(myIMU.imu.g.y);
+    Serial.print(", ");
+    Serial.print(myIMU.imu.g.z);
+    Serial.print("| ");
     Serial.print(motors.getCalculated(FRONT));
     Serial.print(", ");
     Serial.print(motors.getCalculated(RIGHT));

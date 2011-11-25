@@ -42,8 +42,7 @@ private:
 	int _yaw, _pitch, _roll;
 	float _throttle;
 	
-	static uint8_t state;
-	static uint8_t count;
+
 	unsigned int motor_calculated_values[LASTMOTOR];  
 	unsigned int motor_min_values[LASTMOTOR];  
  	unsigned int motor_max_values[LASTMOTOR];   
