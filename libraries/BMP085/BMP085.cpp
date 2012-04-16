@@ -1,6 +1,6 @@
 #include <Wire.h>
 #include "BMP085.h"
-#include "WProgram.h"
+
 
 BMP085::BMP085() {
 	temperatureWait = 4500;
@@ -148,15 +148,15 @@ void BMP085::readCaldata() {
 // Writes val to address register on device
 void BMP085::writeTo(byte device, byte address, byte val) {
 	Wire.beginTransmission(device); // start transmission to device
-	Wire.send(address);             // send register address
-	Wire.send(val);                 // send value to write
+	Wire.write(address);             // send register address
+	Wire.write(val);                 // send value to write
 	Wire.endTransmission();         // end transmission
 }
 
 // Reads num bytes starting from address register on device in to _buff array
 void BMP085::readFrom(byte address, int num, byte _buff[]) {
 	Wire.beginTransmission(BMP085_ADDR); // start transmission to device
-	Wire.send(address);             // sends address to read from
+	Wire.write(address);             // sends address to read from
 	Wire.endTransmission();         // end transmission
 
 	Wire.beginTransmission(BMP085_ADDR); // start transmission to device
@@ -165,7 +165,7 @@ void BMP085::readFrom(byte address, int num, byte _buff[]) {
 	int i = 0;
 	while(Wire.available())         // device may send less than requested (abnormal)
 	{
-		_buff[i] = Wire.receive();    // receive a byte
+		_buff[i] = Wire.read();    // receive a byte
 		i++;
 	}
 	Wire.endTransmission();         // end transmission

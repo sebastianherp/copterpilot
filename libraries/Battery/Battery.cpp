@@ -3,7 +3,6 @@ Battery.cpp - Library to measure A and V of LiPo
 Copyright (C) 2011 Sebastian Herp
 */
 
-#include "WProgram.h"
 #include "Battery.h"
 
 Battery::Battery() {

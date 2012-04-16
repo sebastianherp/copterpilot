@@ -3,7 +3,7 @@ Motors.h - Library to measure A and V of LiPo
 Copyright (C) 2011 Sebastian Herp
 */
 
-#include "WProgram.h"
+#include "Arduino.h"
 
 #ifndef Motors_h
 #define Motors_h

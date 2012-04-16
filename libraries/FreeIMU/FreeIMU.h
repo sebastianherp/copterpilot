@@ -17,8 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <Wire.h>
-#include "WProgram.h"
-
+#include "Arduino.h"
 #include <IMU3000.h>
 #include <BMP085.h>
 #include <LSM303DLH.h>

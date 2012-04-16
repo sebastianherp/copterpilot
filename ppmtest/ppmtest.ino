@@ -20,6 +20,7 @@ void loop()
 {
     delay(20);
     for(int i=0;i<8;i++) {
+      //values[i] = pulseIn(2, LOW);
       Serial.print(values[i]);
       Serial.print(" ");
     }
@@ -27,16 +28,16 @@ void loop()
 }
 
 void flanke() {
-   if(digitalRead(2)) {
+   if(!digitalRead(2)) {
      start = micros();
    } else {
      duration = micros() - start;
      if(duration > 4000)
        counter = 0;
      else {
-       if(counter >= 4)
-         values[counter]  = (values[counter] * 9 + duration) / 10;
-       else
+       //if(counter >= 4)
+       //  values[counter]  = (values[counter] * 9 + duration) / 10;
+       //else
          values[counter]  = duration;
        counter++;
        if(counter >= 8)

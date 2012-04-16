@@ -1,6 +1,5 @@
 #include <Wire.h>
 #include "IMU3000.h"
-#include "WProgram.h"
 
 IMU3000::IMU3000() {
 
@@ -72,15 +71,15 @@ void IMU3000::readImu(int* t, int* gx, int* gy, int* gz, int* ax, int* ay, int* 
 // Writes val to address register on device
 void IMU3000::writeTo(byte device, byte address, byte val) {
 	Wire.beginTransmission(device); // start transmission to device
-	Wire.send(address);             // send register address
-	Wire.send(val);                 // send value to write
+	Wire.write(address);             // send register address
+	Wire.write(val);                 // send value to write
 	Wire.endTransmission();         // end transmission
 }
 
 // Reads num bytes starting from address register on device in to _buff array
 void IMU3000::readFrom(byte address, int num, byte _buff[]) {
 	Wire.beginTransmission(IMUGYRO); // start transmission to device
-	Wire.send(address);             // sends address to read from
+	Wire.write(address);             // sends address to read from
 	Wire.endTransmission();         // end transmission
 
 	Wire.beginTransmission(IMUGYRO); // start transmission to device
@@ -89,7 +88,7 @@ void IMU3000::readFrom(byte address, int num, byte _buff[]) {
 	int i = 0;
 	while(Wire.available())         // device may send less than requested (abnormal)
 	{
-		_buff[i] = Wire.receive();    // receive a byte
+		_buff[i] = Wire.read();    // receive a byte
 		i++;
 	}
 	Wire.endTransmission();         // end transmission

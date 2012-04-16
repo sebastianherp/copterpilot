@@ -1,5 +1,5 @@
-#include "WProgram.h"
 #include <vector.h>
+#include "Arduino.h"
 
 #ifndef IMU3000_h
 #define IMU3000_h

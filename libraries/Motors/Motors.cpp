@@ -3,7 +3,6 @@ Motors.cpp - Library to measure A and V of LiPo
 Copyright (C) 2011 Sebastian Herp
 */
 
-#include "WProgram.h"
 #include "Motors.h"
 
 Motors::Motors(int pin1, int pin2, int pin3, int pin4) {

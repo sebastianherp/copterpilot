@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <inttypes.h>
-#include "WProgram.h"
 #include "FreeIMU.h"
 #include <IMU3000.h>
 #include <BMP085.h>

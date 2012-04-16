@@ -1,4 +1,4 @@
-#include "WProgram.h"
+#include "Arduino.h"
 
 #ifndef BMP085_h
 #define BMP085_h

@@ -10,9 +10,9 @@
 #include <LED.h>
 #include <Motors.h>
 
-#define VERSION 213
+#define VERSION 214
 
-#define BAUD 115200
+#define BAUD 57600
 #define BUZZER_PIN 9
 #define RECEIVER_PIN 2
 #define MOTOR_PINS 4,5,6,7
@@ -124,11 +124,13 @@ void loop()
         else
           noTone(9);
         
-        serialCom();
-        //telemetry();
+        //serialCom();
+        
       }
 
-      
+      if(timer_counter % 40 == 0) { // 5Hz
+        telemetry();
+      }
     }
     if(timer_counter >= 200) {
       timer_counter = 0;
@@ -159,6 +161,13 @@ void telemetry() {
     Serial.print(", ");
     Serial.print(myIMU.imu.g.z);
     Serial.print("| ");
+    
+    for(int i=0;i<8;i++) {
+      Serial.print(receiver.get(i));
+      Serial.print(", ");
+    }
+    
+    
     Serial.print(motors.getCalculated(FRONT));
     Serial.print(", ");
     Serial.print(motors.getCalculated(RIGHT));
@@ -174,7 +183,9 @@ void telemetry() {
     Serial.print(motors.get(REAR));
     Serial.print(", ");
     Serial.print(motors.get(LEFT));
+    
     Serial.println(""); 
+    
 }
 
 

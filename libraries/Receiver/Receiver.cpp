@@ -1,9 +1,8 @@
 /*
-Receiver.cpp - Library to measure A and V of LiPo
+Receiver.cpp - Receive commandos
 Copyright (C) 2011 Sebastian Herp
 */
 
-#include "WProgram.h"
 #include "Receiver.h"
 
 Receiver::Receiver(int pin) {
@@ -14,7 +13,7 @@ Receiver::Receiver(int pin) {
 
 void Receiver::init() {
 	TCCR1A = 0; // normal counting mode
-    TCCR1B = 0 | (1<<CS11); // | (1<<CS10); // prescaler :8
+    TCCR1B = 0 | (1<<CS11);// | (1<<CS10); // prescaler :8
 
     pinMode(_pin, INPUT);
 	for(byte channel = 0; channel < LASTCHANNEL; channel++) {
@@ -30,7 +29,7 @@ unsigned int Receiver::get(char channel) {
 * normal values are between 2000 and 4000 (1000 us - 2000 us)
 */
 void Receiver::update() {
-   if(digitalRead(_pin)) {
+   if(!digitalRead(_pin)) {
      rx_start = TCNT1;
    } else {
      rx_duration = TCNT1 - rx_start;
