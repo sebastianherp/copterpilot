@@ -67,7 +67,7 @@ void serialCom() {
       for(i=0;i<4;i++) serialize16(0); //servo[i]
       for(i=0;i<4;i++) serialize16(motors.get(i));
       for(i=4;i<8;i++) serialize16(motors.get(i-4)); // 8 motors?!
-      for(i=0;i<8;i++) serialize16(receiver.get(i));
+      for(i=0;i<8;i++) serialize16(pilot._receiver.get(i));
       serialize8(1|1<<1|1<<2|1<<3|0<<4); //nunchuk|ACC<<1|BARO<<2|MAG<<3|GPSPRESENT<<4
       serialize8(0); //accMode|baroMode<<1|magMode<<2|(GPSModeHome|GPSModeHold)<<3
       serialize16(cycleTime);

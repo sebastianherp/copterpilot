@@ -6,9 +6,9 @@
 #include <LSM303DLH.h>
 #include <FreeIMU.h>
 #include <Battery.h>
-#include <Receiver.h>
 #include <LED.h>
 #include <Motors.h>
+#include <Pilot.h>
 
 #define VERSION 214
 
@@ -30,7 +30,7 @@ char output[20];
 FreeIMU myIMU = FreeIMU();
 Battery bat = Battery();
 Motors motors = Motors(MOTOR_PINS);
-Receiver receiver = Receiver(RECEIVER_PIN); // pin 2
+//Receiver receiver = Receiver(RECEIVER_PIN); // pin 2
 //LED led = LED();
 
 
@@ -52,9 +52,9 @@ ISR(TIMER1_COMPA_vect) {
     motors.handleInterrupt();
 }
 
-void receiver_update() {
-  receiver.update(); 
-}
+//void receiver_update() {
+//  receiver.update(); 
+//}
 
 
 /**
@@ -69,8 +69,9 @@ void setup()
     motors.init();
     
     // initialize receiver
-    receiver.init();
-    attachInterrupt(0, receiver_update, CHANGE);
+    //receiver.init();
+    //attachInterrupt(0, receiver_update, CHANGE);
+    pilot.init();
     
     // initialize sensors
     myIMU.init();
@@ -163,7 +164,7 @@ void telemetry() {
     Serial.print("| ");
     
     for(int i=0;i<8;i++) {
-      Serial.print(receiver.get(i));
+      Serial.print(pilot._receiver.get(i));
       Serial.print(", ");
     }
     
@@ -199,10 +200,10 @@ void adjustMotors() {
 */
 void adjustMotorsPlus() {
   
-  motors.setYaw(receiver.get(YAW));
-  motors.setThrottle(receiver.get(THROTTLE));
-  motors.setRoll(receiver.get(ROLL));
-  motors.setPitch(receiver.get(PITCH));
+  motors.setYaw(pilot._receiver.get(YAW));
+  motors.setThrottle(pilot._receiver.get(THROTTLE));
+  motors.setRoll(pilot._receiver.get(ROLL));
+  motors.setPitch(pilot._receiver.get(PITCH));
   
   motors.process(ypr);
   if(armed == ON && safetyCheck == ON) {
@@ -212,10 +213,10 @@ void adjustMotorsPlus() {
 }
 
 void processInput() {
-  if(receiver.get(THROTTLE) < RX_LOW) {
+  if(pilot._receiver.get(THROTTLE) < RX_LOW) {
     
     // disarm motors if left stick in lower left corner
-    if(receiver.get(YAW) < RX_LOW && armed == ON) {
+    if(pilot._receiver.get(YAW) < RX_LOW && armed == ON) {
       armed = OFF;
       motors.setAll(MOTOR_OFF);
     }
@@ -223,12 +224,12 @@ void processInput() {
     // TODO: calibration
     
     // arm motors if left stick in lower right corner
-    if(receiver.get(YAW) > RX_HIGH && armed == OFF && safetyCheck == ON) {
+    if(pilot._receiver.get(YAW) > RX_HIGH && armed == OFF && safetyCheck == ON) {
       armed = ON;
       motors.setAll(MOTOR_ON);
     }
     
-    if(receiver.get(YAW) > RX_LOW) safetyCheck = ON;
+    if(pilot._receiver.get(YAW) > RX_LOW) safetyCheck = ON;
   }
   
 }
