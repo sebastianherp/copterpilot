@@ -20,8 +20,9 @@ void Motors::init(int pin1, int pin2, int pin3, int pin4) {
     pinMode(_pin3, OUTPUT);
     pinMode(_pin4, OUTPUT);
   
+    // timer settings for both, receiver & motors    
     TCCR1A = 0; // normal counting mode
-    TCCR1B = 0 | (1<<CS11); // | (1<<CS10); // prescaler :8
+    TCCR1B = 0 | (1<<CS11);// | (1<<CS10); // prescaler :8
     TIMSK1 |= (1<<OCIE1A); // Enable CTC interrupt  
 }
 

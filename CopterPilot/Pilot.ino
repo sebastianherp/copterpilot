@@ -1,4 +1,3 @@
-
 Pilot::Pilot() {
 	 
 }
@@ -7,6 +6,8 @@ void Pilot::init() {
     _receiver.init(RECEIVER_PIN);
     _motors.init(MOTOR_PINS);
     _imu.init();
+
+
     
     pinMode(A0, INPUT); // amps
     pinMode(A1, INPUT); // volts

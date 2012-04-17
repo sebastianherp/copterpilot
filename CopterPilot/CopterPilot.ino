@@ -7,6 +7,8 @@
 #include "config.h"
 #include "classes.h"
 
+#define DEBUG 1
+
 #define ON 1
 #define OFF 0
 
@@ -57,15 +59,25 @@ void setup()
     Serial.begin(BAUD); 
     Wire.begin();
 
+#ifdef DEBUG
+    Serial.println("Init pilot");
+    Serial.println("...");
+#endif
+
     // initialize pilot
     pilot.init();
     
     // receiver works with the pin change interrupt
-    attachInterrupt(0, receiver_update, CHANGE);
+    attachInterrupt(0, receiver_update, RISING);
 
     timer_old = micros();
     timer_counter = 0;
     cycleTime = 0;
+    
+#ifdef DEBUG
+    Serial.println("Setup done");
+#endif
+    
 }
 
 byte light_i = 0;
