@@ -49,24 +49,24 @@ void serialCom() {
       point=0;
       serialize8('M');
       serialize8(VERSION);  // MultiWii Firmware version
-      serialize16(myIMU.imu.a.x);
-      serialize16(myIMU.imu.a.y);
-      serialize16(myIMU.imu.a.z);
+      serialize16(pilot._imu.imu.a.x);
+      serialize16(pilot._imu.imu.a.y);
+      serialize16(pilot._imu.imu.a.z);
       serialize16(1234);
       serialize16(5678);
       serialize16(55555);
       //serialize16(myIMU.imu.g.x);
       //serialize16(myIMU.imu.g.y);
       //serialize16(myIMU.imu.g.z);
-      serialize16(myIMU.magn.m.x);
-      serialize16(myIMU.magn.m.y);
-      serialize16(myIMU.magn.m.z);
+      serialize16(pilot._imu.magn.m.x);
+      serialize16(pilot._imu.magn.m.y);
+      serialize16(pilot._imu.magn.m.z);
 
       serialize16(100); //EstAlt/10
-      serialize16(myIMU.magn.heading()); // compass
+      serialize16(pilot._imu.magn.heading()); // compass
       for(i=0;i<4;i++) serialize16(0); //servo[i]
-      for(i=0;i<4;i++) serialize16(motors.get(i));
-      for(i=4;i<8;i++) serialize16(motors.get(i-4)); // 8 motors?!
+      for(i=0;i<4;i++) serialize16(pilot._motors.get(i));
+      for(i=4;i<8;i++) serialize16(pilot._motors.get(i-4)); // 8 motors?!
       for(i=0;i<8;i++) serialize16(pilot._receiver.get(i));
       serialize8(1|1<<1|1<<2|1<<3|0<<4); //nunchuk|ACC<<1|BARO<<2|MAG<<3|GPSPRESENT<<4
       serialize8(0); //accMode|baroMode<<1|magMode<<2|(GPSModeHome|GPSModeHold)<<3
@@ -90,9 +90,9 @@ void serialCom() {
       serialize8(6); //GPS_numSat
       serialize8(0); //GPS_fix
       serialize8(0); //GPS_update
-      serialize16(bat.ampere);
-      serialize16(bat.ampere_hours);
-      serialize16(bat.voltage);
+      serialize16(pilot.ampere);
+      serialize16(pilot.ampere_hours);
+      serialize16(pilot.voltage);
       serialize16(0);        // 4 variables are here for general monitoring purpose
       serialize16(0);  // debug2
       serialize16(0);                 // debug3
