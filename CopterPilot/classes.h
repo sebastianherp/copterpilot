@@ -47,6 +47,22 @@ private:
 	void set(char motor, unsigned int value) { motor_values[motor] = value; };
 };
 
+class LSM303DLH
+{
+	public:
+		int a[3]; //accelerometer	
+		int m[3]; //magnetometer
+		int m_max[3];
+		int m_min[3];
+	
+		LSM303DLH();
+		void init(void);
+		void reset(void);
+		void read(void);
+		int heading(void);
+		int heading(vector from);
+};
+
 #ifndef cbi
 #define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
 #endif

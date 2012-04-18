@@ -1,5 +1,7 @@
-#include <vector.h>
-#include <math.h>
+typedef struct vector
+{
+  float x, y, z;
+} vector;
 
 void vector_cross(const vector *a,const vector *b, vector *out)
 {

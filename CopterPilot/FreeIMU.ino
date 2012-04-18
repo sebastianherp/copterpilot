@@ -51,7 +51,7 @@ void FreeIMU::init(bool fastmode) {
   imu.init();
   // calibrate the IMU3000
   // TODO: imu.zeroCalibrate(64,5);
-  zeroCalibrateGyro(164,5);
+  //zeroCalibrateGyro(164,5);
   
 }
 
@@ -69,9 +69,9 @@ void FreeIMU::zeroCalibrateGyro(unsigned int totSamples, unsigned int sampleDela
   for (int i = 0;i < totSamples;i++){
     delay(sampleDelayMS);
 	imu.read();
-    tmpOffsets[0] += imu.g.x;
-    tmpOffsets[1] += imu.g.y;
-    tmpOffsets[2] += imu.g.z;  
+    tmpOffsets[0] += imu.g[0];
+    tmpOffsets[1] += imu.g[1];
+    tmpOffsets[2] += imu.g[2];  
   }
   g_bias.x = -tmpOffsets[0] / totSamples;
   g_bias.y = -tmpOffsets[1] / totSamples;
@@ -243,20 +243,17 @@ void FreeIMU::getQ(float * q) {
   //float max = maxOfVector(m_max);
   //float min = -maxOfVector((vector){m_min.x, m_min.y, m_min.z});
   
-  float gx = (imu.g.x + g_bias.x) * g_scale.x;
-  float gy = (imu.g.y + g_bias.y) * g_scale.y;
-  float gz = (imu.g.z + g_bias.z) * g_scale.z;
-  float ax = imu.a.x;
-  float ay = imu.a.y;
-  float az = imu.a.z;
-  float mx = (magn.m.x - magn.m_min.x);
-  mx = mx / (magn.m_max.x - magn.m_min.x) * 2 - 1.0;
-  float my = (magn.m.y - magn.m_min.y);
-  my = my / (magn.m_max.y - magn.m_min.y) * 2 - 1.0;
-  float mz = (magn.m.z - magn.m_min.z);
-  mz = mz / (magn.m_max.z - magn.m_min.z) * 2 - 1.0;
+  float gx = (imu.g[0] + g_bias.x) * g_scale.x;
+  float gy = (imu.g[1] + g_bias.y) * g_scale.y;
+  float gz = (imu.g[2] + g_bias.z) * g_scale.z;
+  float ax = imu.a[0];
+  float ay = imu.a[1];
+  float az = imu.a[2];
+  float mx = magn.m[0];
+  float my = magn.m[1];
+  float mz = magn.m[2];
   
-  AHRSupdate(gx, gy, gz, ax, ay, az, magn.m.x, magn.m.y, magn.m.z);
+  AHRSupdate(gx, gy, gz, ax, ay, az, mx, my, mz);
 
   q[0] = q0;
   q[1] = q1;

@@ -1,4 +1,3 @@
-#include <vector.h>
 #include "Arduino.h"
 
 #ifndef IMU3000_h
@@ -12,8 +11,8 @@
 class IMU3000
 {
 public:
-	vector a;
-	vector g;
+	int a[3];
+	int g[3];
 	float temp;
 	
 	IMU3000();

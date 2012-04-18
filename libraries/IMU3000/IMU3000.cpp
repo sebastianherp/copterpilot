@@ -38,12 +38,12 @@ void IMU3000::init() {
 void IMU3000::read() {
 	readImu(imuval);
 	temp = (imuval[0] + 13200) / 280.0 + 35.0;	
-	g.x = imuval[1];
-	g.y = imuval[2];
-	g.z = imuval[3];
-	a.x = imuval[4];
-	a.y = imuval[5];
-	a.z = imuval[6];
+	g[0] = imuval[1];
+	g[1] = imuval[2];
+	g[2] = imuval[3];
+	a[0] = imuval[4];
+	a[1] = imuval[5];
+	a[2] = imuval[6];
 }
 
 void IMU3000::readImu(int *tgxgygzaxayaz) {

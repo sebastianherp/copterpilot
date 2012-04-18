@@ -1,10 +1,3 @@
-#include <LSM303DLH.h>
-#include <Wire.h>
-#include <math.h>
-#include <vector.h>
-
-// Defines ////////////////////////////////////////////////////////////////
-
 // The Arduino two-wire interface uses a 7-bit number for the address, 
 // and sets the last bit correctly based on reads and writes
 #define ACC_ADDRESS 		(0x30 >> 1)
@@ -66,6 +59,7 @@ LSM303DLH::LSM303DLH()
 // mode.
 void LSM303DLH::init(void)
 {
+
 	//Enable Accelerometer
 	Wire.beginTransmission(ACC_ADDRESS);
 	Wire.write(CTRL_REG1_A);
@@ -87,14 +81,16 @@ void LSM303DLH::reset(void)
 {
 	// These are just some values for a particular unit, it is recommended that
 	// a calibration be done for your particular unit.
-	m_max.x = +100; m_max.y = +100; m_max.z = 100;
-	m_min.x = -100; m_min.y = -100; m_min.z = -100;
+	m_max[0] = +100; m_max[1] = +100; m_max[2] = 100;
+	m_min[0] = -100; m_min[1] = -100; m_min[2] = -100;
 
 }
 
 // Reads all 6 channels of the LSM303DLH and stores them in the object variables
 void LSM303DLH::read()
 {
+	uint8_t i;
+
 	//read accelerometer
 	Wire.beginTransmission(ACC_ADDRESS);
 	// assert the MSB of the address to get the accelerometer 
@@ -112,9 +108,9 @@ void LSM303DLH::read()
 	uint8_t zla = Wire.read();
 	uint8_t zha = Wire.read();
 
-	a.x = (xha << 8 | xla) >> 4;
-	a.y = (yha << 8 | yla) >> 4;
-	a.z = (zha << 8 | zla) >> 4;
+	a[0] = (xha << 8 | xla) >> 4;
+	a[1] = (yha << 8 | yla) >> 4;
+	a[2] = (zha << 8 | zla) >> 4;
 	
 	//read magnetometer
 	Wire.beginTransmission(MAG_ADDRESS);
@@ -131,23 +127,15 @@ void LSM303DLH::read()
 	uint8_t zhm = Wire.read();
 	uint8_t zlm = Wire.read();
 
-	m.x = (xhm << 8 | xlm);
-	m.y = (yhm << 8 | ylm);
-	m.z = (zhm << 8 | zlm);
+	m[0] = (xhm << 8 | xlm);
+	m[1] = (yhm << 8 | ylm);
+	m[2] = (zhm << 8 | zlm);
 	
-	//update magnometer maxima
-	if (m.x > m_max.x) m_max.x = m.x;
-	if (m.y > m_max.y) m_max.y = m.y;
-	if (m.z > m_max.z) m_max.z = m.z;  
-
-	if (m.x < m_min.x) m_min.x = m.x;
-	if (m.y < m_min.y) m_min.y = m.y;
-	if (m.z < m_min.z) m_min.z = m.z;
-	
-	// shift and scale
-	m.x = (m.x - m_min.x) / (m_max.x - m_min.x) * 2 - 1.0;
-    m.y = (m.y - m_min.y) / (m_max.y - m_min.y) * 2 - 1.0;
-    m.z = (m.z - m_min.z) / (m_max.z - m_min.z) * 2 - 1.0;
+	for(i=0;i<3;i++) {
+		if (m[i] > m_max[i]) m_max[i] = m[i];	//update magnometer maxima
+		if (m[i] < m_min[i]) m_min[i] = m[i];	//update magnometer minima
+		//m[i] = (m[i] - m_min[i]) / (m_max[i] - m_min[i]) * 2 - 1.0;	// shift and scale
+	}
 }
 
 // Returns the number of degrees from the -Y axis that it
@@ -161,15 +149,20 @@ int LSM303DLH::heading()
 // is pointing.
 int LSM303DLH::heading(vector from)
 {
-	vector temp_a = a;
+    vector temp_a = (vector){a[0],a[1],a[2]};
+    vector temp_m; //= (vector){m[0],m[1],m[2]};
+    temp_m.x = (m[0] - m_min[0]) / (m_max[0] - m_min[0]) * 2.0 - 1.0;
+    temp_m.y = (m[1] - m_min[1]) / (m_max[1] - m_min[1]) * 2.0 - 1.0;
+    temp_m.z = (m[2] - m_min[2]) / (m_max[2] - m_min[2]) * 2.0 - 1.0;
+    
     // normalize
     vector_normalize(&temp_a);
-    //vector_normalize(&m);
+    //vector_normalize(&temp_m);
 
     // compute E and N
     vector E;
     vector N;
-    vector_cross(&m,&temp_a,&E);
+    vector_cross(&temp_m,&temp_a,&E);
     vector_normalize(&E);
     vector_cross(&temp_a,&E,&N);
 	
