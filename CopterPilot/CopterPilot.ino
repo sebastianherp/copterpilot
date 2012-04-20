@@ -102,7 +102,6 @@ void loop()
           break;
       }
 //      telemetry();
-      serialCom();
     }
     
     /* 1 Hz stuff */
@@ -110,11 +109,22 @@ void loop()
       scheduler1Hz = timer_now + 1000000;
       cycleCounter = cycle_counter;
       cycle_counter = 0;
+      /*
+          SerialWrite(0,'+');
+    SerialWriteInt(0, pilot._imu.imu.g[0]);
+    SerialWrite(0,',');
+    SerialWrite(0,' ');
+    SerialWriteInt(0, pilot._imu.imu.g[1]);
+    SerialWrite(0,',');
+    SerialWrite(0,' ');
+    SerialWriteInt(0, pilot._imu.imu.g[2]);
+    SerialWrite(0,'\n'); */
     }
     
 
     // as fast as possible
     pilot.imu_update();
+       
     
     timer_now = micros();
     cycleTime = timer_now - timer_old;
@@ -124,7 +134,9 @@ void loop()
     if(cycleTimeMax<cycleTime) cycleTimeMax = cycleTime;
     if(cycleTimeMin>cycleTime) cycleTimeMin = cycleTime;
 
-    pilot.adjustMotorsPlus();    
+    pilot.adjustMotorsPlus();
+
+    serialCom();
 }
 
 /*

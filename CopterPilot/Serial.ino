@@ -25,8 +25,8 @@ void serialCom() {
     case 'M': // Multiwii @ arduino to GUI all data
       serialize8('M');
       serialize8(VERSION);  // MultiWii Firmware version
-      for(i=0;i<3;i++) serialize16(pilot._imu.magn.a[i]/5); //pilot._imu.imu.a[i]);
-      for(i=0;i<3;i++) serialize16(0); //518);
+      for(i=0;i<3;i++) serialize16(pilot._imu.imu.a[i]); //pilot._imu.imu.a[i]);
+      for(i=0;i<3;i++) serialize16(pilot._imu.imu.g[i]); //518);
       for(i=0;i<3;i++) serialize16(pilot._imu.magn.m[i]); //519);
 
       serialize16(100); //100); //EstAlt/10
@@ -62,7 +62,7 @@ void serialCom() {
       serialize16(NULLDATA); //pilot.ampere_hours);
       serialize8(pilot.voltage);
       serialize16(123); //0);        // 4 variables are here for general monitoring purpose
-      serialize16(12345); //0);  // debug2
+      serialize16(SerialAvailable(0)); //0);  // debug2
       serialize16(cycleTimeMax); //0);                 // debug3
       serialize16(cycleCounter); //0);                 // debug4
       serialize8('M');
@@ -165,3 +165,13 @@ void SerialWrite(uint8_t port,uint8_t c){
   }
 }
 
+void SerialWriteInt(uint8_t port, int number){
+  uint8_t t, i;
+  unsigned long limit = 100000;
+  while(limit > 1) {
+    limit = limit / 10;
+    t = number / limit;
+    SerialWrite(port, '0' + t);
+    number = number % limit;
+  }
+}
