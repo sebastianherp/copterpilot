@@ -6,8 +6,8 @@
    This is the minimum value that allow motors to run at a idle speed  */
 //#define MINTHROTTLE 1300 // for Turnigy Plush ESCs 10A
 //#define MINTHROTTLE 1120 // for Super Simple ESCs 10A
-#define MINTHROTTLE 1220
-//#define MINTHROTTLE 1150 
+//#define MINTHROTTLE 1220
+#define MINTHROTTLE 1150 
 
 /* The type of multicopter */
 //#define GIMBAL
@@ -173,7 +173,7 @@
    IMPORTANT! Change low pass filter setting changes PID behaviour, so retune your PID's after changing LPF.*/
 //#define ITG3200_LPF_256HZ     // This is the default setting, no need to uncomment, just for reference
 //#define ITG3200_LPF_188HZ
-//#define ITG3200_LPF_98HZ
+#define ITG3200_LPF_98HZ
 //#define ITG3200_LPF_42HZ
 //#define ITG3200_LPF_20HZ
 //#define ITG3200_LPF_10HZ      // Use this only in extreme cases, rather change motors and/or props
