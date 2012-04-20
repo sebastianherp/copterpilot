@@ -6,8 +6,8 @@
    This is the minimum value that allow motors to run at a idle speed  */
 //#define MINTHROTTLE 1300 // for Turnigy Plush ESCs 10A
 //#define MINTHROTTLE 1120 // for Super Simple ESCs 10A
-//#define MINTHROTTLE 1220
-#define MINTHROTTLE 1150 
+#define MINTHROTTLE 1220
+//#define MINTHROTTLE 1150 
 
 /* The type of multicopter */
 //#define GIMBAL
@@ -290,7 +290,7 @@
 
 /* this is the maximum value for the ESCs at full power
    this value can be increased up to 2000 */
-#define MAXTHROTTLE 1850
+#define MAXTHROTTLE 2000
 
 /* This is the speed of the serial interface. 115200 kbit/s is the best option for a USB connection.*/
 #define SERIAL_COM_SPEED 115200
@@ -300,7 +300,7 @@
 /********************************************************************/
 /* In order to save space, it's possibile to desactivate the LCD configuration functions
    comment this line only if you don't plan to used a LCD */
-#define LCD_CONF
+//#define LCD_CONF
 /* to include setting the aux switches for AUX1 and AUX2 via LCD */
 //#define LCD_CONF_AUX_12
 /* to include setting the aux switches for AUX1, AUX2, AUX3 and AUX4 via LCD */
