@@ -25,6 +25,8 @@
 //#define FLYING_WING
 //#define VTAIL4
 
+#define CUSTOMMOTORPINS // needed because i need spi
+
 #define YAW_DIRECTION 1 // if you want to reverse the yaw correction direction
 //#define YAW_DIRECTION -1
 

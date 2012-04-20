@@ -57,14 +57,14 @@
   #define V_BATPIN                   A1    // Analog PIN 3
   #define PSENSORPIN                 A0    // Analog PIN 2
   
-  #define SOFT_PWM_1_PIN_HIGH        PORTD |= 1<<5;
-  #define SOFT_PWM_1_PIN_LOW         PORTD &= ~(1<<5);
-  #define SOFT_PWM_2_PIN_HIGH        PORTD |= 1<<6;
-  #define SOFT_PWM_2_PIN_LOW         PORTD &= ~(1<<6);
-  #define SOFT_PWM_3_PIN_HIGH        PORTC |= 1<<2;
-  #define SOFT_PWM_3_PIN_LOW         PORTC &= ~(1<<2);
-  #define SOFT_PWM_4_PIN_HIGH        PORTB |= 1<<4;
-  #define SOFT_PWM_4_PIN_LOW         PORTB &= ~(1<<4);
+  #define SOFT_PWM_1_PIN_HIGH        PORTD |= 1<<4;    // pin d4 // rear right
+  #define SOFT_PWM_1_PIN_LOW         PORTD &= ~(1<<4);
+  #define SOFT_PWM_2_PIN_HIGH        PORTD |= 1<<5;    // pin d5 // front right
+  #define SOFT_PWM_2_PIN_LOW         PORTD &= ~(1<<5);
+  #define SOFT_PWM_3_PIN_HIGH        PORTD |= 1<<6;    // pin d6 // rear left
+  #define SOFT_PWM_3_PIN_LOW         PORTD &= ~(1<<6);
+  #define SOFT_PWM_4_PIN_HIGH        PORTD |= 1<<7;    // pin d7 // front left
+  #define SOFT_PWM_4_PIN_LOW         PORTD &= ~(1<<7);
   
   #define SERVO_1_PINMODE            pinMode(A0,OUTPUT); // TILT_PITCH - WING left
   #define SERVO_1_PIN_HIGH           PORTC |= 1<<0;
