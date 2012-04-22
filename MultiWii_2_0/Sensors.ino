@@ -817,18 +817,24 @@ void i2c_ACC_getADC(){
 // contribution from wektorx (http://www.multiwii.com/forum/viewtopic.php?f=8&t=863)
 // ************************************************************************************************************
 #if defined(LSM303DLx_ACC)
+  #define ACC_ADDRESS 0x30
+  #define ACC_CTRL_REG1_A 0x20
+  #define ACC_CTRL_REG2_A 0x21
+  #define ACC_CTRL_REG4_A 0x23
+  #define ACC_OUT_X_L_A   0x28
+  
 void ACC_init () {
   delay(10);
-  i2c_writeReg(0x30,0x20,0x27);
-  i2c_writeReg(0x30,0x23,0x30);
-  i2c_writeReg(0x30,0x21,0x00);
+  i2c_writeReg(ACC_ADDRESS,ACC_CTRL_REG1_A,0x2F); // was 0x27, but that means 50 Hz sample rate 0x37 ist 400 Hz, 0x2F is 100 Hz
+  i2c_writeReg(ACC_ADDRESS,ACC_CTRL_REG4_A,0x30); // full scale is +-8g
+  i2c_writeReg(ACC_ADDRESS,ACC_CTRL_REG2_A,0x00); // no high-pass filters
 
   acc_1G = 256;
 }
 
-  void ACC_getADC () {
+void ACC_getADC () {
   TWBR = ((16000000L / 400000L) - 16) / 2;
-  i2c_getSixRawADC(0x30,0xA8);
+  i2c_getSixRawADC(ACC_ADDRESS,ACC_OUT_X_L_A | (1 << 7)); // same as 0xA8 before
 
   ACC_ORIENTATION( ((rawADC[1]<<8) | rawADC[0])/16 ,
                    ((rawADC[3]<<8) | rawADC[2])/16 ,
@@ -963,6 +969,35 @@ void Mag_getADC() {
     }
   }
 }
+#endif
+
+// ************************************************************************************************************
+// I2C Compass LSM303DLx
+// ************************************************************************************************************
+// I2C adress: 0x3C (ACC 0x30 both 8bit, 
+// ************************************************************************************************************
+#if defined(LSM303DLx_MAG)
+  #define MAG_ADDRESS 0x3C
+  #define MAG_CTRL_REG1_A 0x20
+  #define MAG_CRA_REG_M   0x00
+  #define MAG_CRB_REG_M   0x01
+  #define MAG_MR_REG_M    0x02
+  #define MAG_OUT_X_H_M 0x03
+  
+  void Mag_init() {
+    i2c_writeReg(MAG_ADDRESS,MAG_CRA_REG_M,0x10);  // 15 Hz minimum data output rate (0x0C = 7.5 Hz, 0x14 = 30 Hz)
+    i2c_writeReg(MAG_ADDRESS,MAG_CRB_REG_M,0x20);  // 1.3 Ga gain
+    i2c_writeReg(MAG_ADDRESS,MAG_MR_REG_M,0x00);   // Continous conversion mod
+    delay(100);
+    magInit = 1;
+  }
+  
+  void Device_Mag_getADC() {
+    i2c_getSixRawADC(MAG_ADDRESS,MAG_OUT_X_H_M);
+    MAG_ORIENTATION( ((rawADC[0]<<8) | rawADC[1]) ,          
+                     ((rawADC[2]<<8) | rawADC[3]) ,     
+                     ((rawADC[4]<<8) | rawADC[5]) );
+  }
 #endif
 
 // ************************************************************************************************************

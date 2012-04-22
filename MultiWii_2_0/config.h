@@ -160,6 +160,7 @@
 //#define HMC5883
 //#define AK8975
 //#define MAG3110
+//#define LSM303DLx_MAG
 
 /* ADC accelerometer */ // for 5DOF from sparkfun, uses analog PIN A1/A2/A3
 //#define ADCACC
