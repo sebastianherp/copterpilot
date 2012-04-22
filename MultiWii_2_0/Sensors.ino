@@ -925,7 +925,55 @@ void Gyro_getADC () {
 // ************************************************************************************************************
 #if MAG
 static float   magCal[3] = {1.0,1.0,1.0};  // gain for each axis, populated at sensor init
+static int16_t magXoff, magYoff, magZoff; //offsets for each axis
 static uint8_t magInit = 0;
+
+//#define MAG_NEW
+
+#if defined(MAG_NEW)
+void Mag_getADC() {
+  static uint32_t t,tCal = 0;
+  static int16_t magZeroTempMin[3];
+  static int16_t magZeroTempMax[3];
+  uint8_t axis;
+  if ( currentTime < t ) return; //each read is spaced by 100ms
+  t = currentTime + 100000;
+  TWBR = ((16000000L / 400000L) - 16) / 2; // change the I2C clock rate to 400kHz
+  Device_Mag_getADC();
+
+  if (calibratingM == 1) {
+    tCal = t;
+    for(axis=0;axis<3;axis++) {magZero[axis] = 0;magZeroTempMin[axis] = 0; magZeroTempMax[axis] = 0;}
+    magXoff = 0;    //Zero out offsets
+    magYoff = 0;
+    magZoff = 0;
+    calibratingM = 0;
+  }
+
+  magADC[ROLL]  = magADC[ROLL]*magCal[ROLL]+magXoff;
+  magADC[PITCH] = magADC[PITCH]*magCal[PITCH]+magYoff;
+  magADC[YAW]   = magADC[YAW]*magCal[YAW]+magZoff;
+
+  if (tCal != 0) {
+    if ((t - tCal) < 30000000) { // 30s: you have 30s to turn the multi in all directions
+      LEDPIN_TOGGLE;
+      for(axis=0;axis<3;axis++) {
+        if (magADC[axis] < magZeroTempMin[axis]) magZeroTempMin[axis] = magADC[axis];
+        if (magADC[axis] > magZeroTempMax[axis]) magZeroTempMax[axis] = magADC[axis];
+      }
+    } else {
+      tCal = 0;
+      for(axis=0;axis<3;axis++)
+        magZero[axis] = (( magZeroTempMax[axis]-magZeroTempMin[axis])/2 - magZeroTempMax[axis]); //Calculate offsets
+      magXoff = magZero[ROLL];    //Store them
+      magYoff = magZero[PITCH];
+      magZoff = magZero[YAW];  
+        
+      writeParams();
+    }
+  }
+}
+#else
 
 void Mag_getADC() {
   static uint32_t t,tCal = 0;
@@ -969,6 +1017,8 @@ void Mag_getADC() {
     }
   }
 }
+#endif
+
 #endif
 
 // ************************************************************************************************************
