@@ -129,14 +129,14 @@
   #define USB_CDC_RX                 2
   
   //soft PWM Pins  
-  #define SOFT_PWM_1_PIN_HIGH        PORTD |= 1<<4;
-  #define SOFT_PWM_1_PIN_LOW         PORTD &= ~(1<<4);
-  #define SOFT_PWM_2_PIN_HIGH        PORTF |= 1<<5;
-  #define SOFT_PWM_2_PIN_LOW         PORTF &= ~(1<<5);
-  #define SOFT_PWM_3_PIN_HIGH        PORTF |= 1<<7;
-  #define SOFT_PWM_3_PIN_LOW         PORTF &= ~(1<<7);
-  #define SOFT_PWM_4_PIN_HIGH        PORTF |= 1<<6;
-  #define SOFT_PWM_4_PIN_LOW         PORTF &= ~(1<<6);
+  #define SOFT_PWM_1_PIN_HIGH        PORTD |= 1<<5;
+  #define SOFT_PWM_1_PIN_LOW         PORTD &= ~(1<<5);
+  #define SOFT_PWM_2_PIN_HIGH        PORTD |= 1<<6;
+  #define SOFT_PWM_2_PIN_LOW         PORTD &= ~(1<<6);
+  #define SOFT_PWM_3_PIN_HIGH        PORTC |= 1<<2;
+  #define SOFT_PWM_3_PIN_LOW         PORTC &= ~(1<<2);
+  #define SOFT_PWM_4_PIN_HIGH        PORTB |= 1<<4;
+  #define SOFT_PWM_4_PIN_LOW         PORTB &= ~(1<<4);
   
   // Servos
   #define SERVO_1_PINMODE   pinMode(A0,OUTPUT);

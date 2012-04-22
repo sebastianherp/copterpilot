@@ -1,5 +1,5 @@
 #if defined(PROMINI)
-  uint8_t PWM_PIN[8] = {4,5,6,7,6,5,A2,12}; //{9,10,11,3,6,5,A2,12};   //for a quad+: rear,right,left,front
+  uint8_t PWM_PIN[8] = {9,10,11,3,6,5,A2,12};   //for a quad+: rear,right,left,front
 #endif
 #if defined(PROMICRO)
   #if !defined(HWPWM6)
@@ -36,7 +36,6 @@
   volatile uint16_t atomicPWM_PIN12_lowState;
   volatile uint16_t atomicPWM_PIN12_highState;
 #endif
-
 
 void writeServos() {
   #if defined(SERVO)
@@ -195,7 +194,6 @@ void writeMotors() { // [1000;2000] => [125;250]
     #endif
   #endif
   #if defined(PROMINI)
-  #ifndef CUSTOMMOTORPINS
     #if (NUMBER_MOTOR > 0)
       #ifndef EXT_MOTOR_RANGE 
         OCR1A = motor[0]>>3; //  pin 9
@@ -236,17 +234,6 @@ void writeMotors() { // [1000;2000] => [125;250]
       atomicPWM_PIN12_highState = ((motor[7]-1000)>>2)+5;
       atomicPWM_PIN12_lowState  = 245-atomicPWM_PIN12_highState;
     #endif
-  #else
-    //custom motor pins (use softpwm)
-    atomicPWM_PIN6_highState = ((motor[0]-1000)>>2)+5;
-    atomicPWM_PIN6_lowState  = 245-atomicPWM_PIN6_highState;
-    atomicPWM_PIN5_highState = ((motor[1]-1000)>>2)+5;
-    atomicPWM_PIN5_lowState  = 245-atomicPWM_PIN5_highState;
-    atomicPWM_PINA2_highState = ((motor[2]-1000)>>2)+5;
-    atomicPWM_PINA2_lowState  = 245-atomicPWM_PINA2_highState;
-    atomicPWM_PIN12_highState = ((motor[3]-1000)>>2)+5;
-    atomicPWM_PIN12_lowState  = 245-atomicPWM_PIN12_highState;
-  #endif
   #endif
 }
 
@@ -340,7 +327,6 @@ void initOutput() {
     #endif
   #endif
   #if defined(PROMINI)
-  #if !defined(CUSTOMMOTORPINS)
     #if (NUMBER_MOTOR > 0)
       TCCR1A |= _BV(COM1A1); // connect pin 9 to timer 1 channel A
     #endif
@@ -360,9 +346,6 @@ void initOutput() {
         pinMode(A0,OUTPUT);pinMode(A1,OUTPUT);
       #endif
     #endif
-  #else
-    initializeSoftPWM(); // don't use hardware pwm ... we need that for spi
-  #endif
   #endif
   
   writeAllMotors(MINCOMMAND);
@@ -533,8 +516,7 @@ ISR(SERVO_ISR) {
 }
 #endif
 
-
-#if (NUMBER_MOTOR > 4 || defined(CUSTOMMOTORPINS)) && (defined(PROMINI) || defined(PROMICRO))
+#if (NUMBER_MOTOR > 4) && (defined(PROMINI) || defined(PROMICRO))
 
   #if !defined(PROMICRO) || defined(HWPWM6)
     #define SOFT_PWM_ISR1 TIMER0_COMPB_vect
@@ -551,10 +533,10 @@ ISR(SERVO_ISR) {
   void initializeSoftPWM() {
     #if !defined(PROMICRO) || defined(HWPWM6)
       TCCR0A = 0; // normal counting mode
-      #if (NUMBER_MOTOR > 4 || defined(CUSTOMMOTORPINS)) && !defined(HWPWM6) 
+      #if (NUMBER_MOTOR > 4) && !defined(HWPWM6) 
         TIMSK0 |= (1<<OCIE0B); // Enable CTC interrupt  
       #endif
-      #if (NUMBER_MOTOR > 6 || defined(CUSTOMMOTORPINS))
+      #if (NUMBER_MOTOR > 6)
         TIMSK0 |= (1<<OCIE0A);
       #endif
     #else
@@ -606,7 +588,7 @@ ISR(SERVO_ISR) {
   }
 
   //the same with digital PIN A2 & 12 OCR0A counter for OCTO
-  #if (NUMBER_MOTOR > 6 || defined(CUSTOMMOTORPINS)) && !defined(HWPWM6)
+  #if (NUMBER_MOTOR > 6) && !defined(HWPWM6)
     ISR(SOFT_PWM_ISR2) {
       static uint8_t state = 0;
       if(state == 0){
