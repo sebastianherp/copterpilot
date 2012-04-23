@@ -62,7 +62,8 @@ static uint8_t  GPSModeHold = 0;    // if GPS PH is activated
 static uint8_t  headFreeMode = 0;   // if head free mode is a activated
 static uint8_t  passThruMode = 0;   // if passthrough mode is activated
 static int16_t  headFreeModeHold;
-static int16_t  gyroADC[3],accADC[3],accSmooth[3],magADC[3];
+static int16_t  gyroADC[3],accADC[3],accSmooth[3];
+static float magADC[3];
 static int16_t  accTrim[2] = {0, 0};
 static int16_t  heading,magHold;
 static uint8_t  calibratedACC = 0;

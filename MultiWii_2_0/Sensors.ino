@@ -829,16 +829,16 @@ void ACC_init () {
   i2c_writeReg(ACC_ADDRESS,ACC_CTRL_REG4_A,0x30); // full scale is +-8g
   i2c_writeReg(ACC_ADDRESS,ACC_CTRL_REG2_A,0x00); // no high-pass filters
 
-  acc_1G = 256;
+  acc_1G = 512;
 }
 
 void ACC_getADC () {
   TWBR = ((16000000L / 400000L) - 16) / 2;
   i2c_getSixRawADC(ACC_ADDRESS,ACC_OUT_X_L_A | (1 << 7)); // same as 0xA8 before
 
-  ACC_ORIENTATION( ((rawADC[1]<<8) | rawADC[0])/16 ,
-                   ((rawADC[3]<<8) | rawADC[2])/16 ,
-                   ((rawADC[5]<<8) | rawADC[4])/16 );
+  ACC_ORIENTATION( ((rawADC[1]<<8) | rawADC[0])/8 ,
+                   ((rawADC[3]<<8) | rawADC[2])/8 ,
+                   ((rawADC[5]<<8) | rawADC[4])/8 );
   ACC_Common();
 }
 #endif
