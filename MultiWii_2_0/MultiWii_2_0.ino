@@ -82,6 +82,7 @@ static int16_t  debug1,debug2,debug3,debug4;
 static uint16_t cycleTimeMax = 0;       // highest ever cycle timen
 static uint16_t cycleTimeMin = 65535;   // lowest ever cycle timen
 static uint16_t powerMax = 0;           // highest ever current
+static uint16_t cycleCount = 0;
 
 static int16_t  i2c_errors_count = 0;
 static int16_t  annex650_overrun_count = 0;
@@ -398,11 +399,20 @@ void loop () {
   static int16_t errorGyroI[3] = {0,0,0};
   static int16_t errorAngleI[2] = {0,0};
   static uint32_t rcTime  = 0;
+  static uint32_t countTime = 0;
   static int16_t initialThrottleHold;
 
   #if defined(SPEKTRUM)
     if (rcFrameComplete) computeRC();
   #endif
+  
+  cycleCount++;
+
+  if (currentTime > countTime) { // 1Hz
+    countTime = currentTime + 1000000;
+    debug2 = cycleCount;
+    cycleCount = 0;
+  }
 
   if (currentTime > rcTime ) { // 50Hz
     rcTime = currentTime + 20000;

@@ -337,6 +337,7 @@
 #if defined(CUSTOMIMU)
   #define ITG3200
 //  #define ADXL345 // this is actually an ADXL346 but that's just the same as ADXL345
+  #define ADXL345_ADDRESS 0xA6
   #define LSM303DLx_ACC
   #define LSM303DLx_MAG  
   #define BMP085
@@ -344,7 +345,6 @@
 //  #define ACC_ORIENTATION(X, Y, Z)  {accADC[ROLL]  = X; accADC[PITCH]  = Y; accADC[YAW]  =  Z;} // ADXL345
   #define GYRO_ORIENTATION(X, Y, Z) {gyroADC[ROLL] =  Y; gyroADC[PITCH] = -X; gyroADC[YAW] = -Z;}
   #define MAG_ORIENTATION(X, Y, Z)  {magADC[ROLL]  =  -X; magADC[PITCH]  =  -Y; magADC[YAW]  = -Z;}
-  #define ADXL345_ADDRESS 0xA6
   #undef INTERNAL_I2C_PULLUPS
 #endif
 
