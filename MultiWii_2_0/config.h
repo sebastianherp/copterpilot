@@ -87,7 +87,7 @@
 
 /* introduce a deadband around the stick center
    Must be greater than zero, comment if you dont want a deadband on roll, pitch and yaw */
-#define DEADBAND 10
+#define DEADBAND 6
 
 /* interleaving delay in micro seconds between 2 readings WMP/NK in a WMP+NK config
    if the ACC calibration time is very long (20 or 30s), try to increase this delay up to 4000
@@ -172,7 +172,7 @@
    IMPORTANT! Change low pass filter setting changes PID behaviour, so retune your PID's after changing LPF.*/
 //#define ITG3200_LPF_256HZ     // This is the default setting, no need to uncomment, just for reference
 //#define ITG3200_LPF_188HZ
-#define ITG3200_LPF_98HZ
+//#define ITG3200_LPF_98HZ
 //#define ITG3200_LPF_42HZ
 //#define ITG3200_LPF_20HZ
 //#define ITG3200_LPF_10HZ      // Use this only in extreme cases, rather change motors and/or props
@@ -289,7 +289,7 @@
 
 /* this is the maximum value for the ESCs at full power
    this value can be increased up to 2000 */
-#define MAXTHROTTLE 2000
+#define MAXTHROTTLE 1850
 
 /* This is the speed of the serial interface. 115200 kbit/s is the best option for a USB connection.*/
 #define SERIAL_COM_SPEED 115200
@@ -378,7 +378,7 @@
 //#define MOTOR_STOP
 
 /* some radios have not a neutral point centered on 1500. can be changed here */
-#define MIDRC 1480
+#define MIDRC 1500
 
 /* The following lines apply only for a pitch/roll tilt stabilization system
    Uncomment the first line to activate it */
