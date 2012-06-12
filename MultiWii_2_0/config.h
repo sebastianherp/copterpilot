@@ -87,7 +87,7 @@
 
 /* introduce a deadband around the stick center
    Must be greater than zero, comment if you dont want a deadband on roll, pitch and yaw */
-#define DEADBAND 6
+#define DEADBAND 10
 
 /* interleaving delay in micro seconds between 2 readings WMP/NK in a WMP+NK config
    if the ACC calibration time is very long (20 or 30s), try to increase this delay up to 4000
@@ -107,7 +107,7 @@
      Note from Alex: I only own some boards
                      for other boards, I'm not sure, the info was gathered via rc forums, be cautious */
 
-#define CUSTOMIMU         // Custom design, almost like FreeIMU
+//#define CUSTOMIMU         // Custom design, almost like FreeIMU
 //#define FFIMUv1         // first 9DOF+baro board from Jussi, with HMC5843                   <- confirmed by Alex
 //#define FFIMUv2         // second version of 9DOF+baro board from Jussi, with HMC5883       <- confirmed by Alex
 //#define FREEIMUv1       // v0.1 & v0.2 & v0.3 version of 9DOF board from Fabio
@@ -116,7 +116,7 @@
 //#define FREEIMUv035_MS  // FreeIMU v0.3.5_MS                                                <- confirmed by Alex
 //#define FREEIMUv035_BMP // FreeIMU v0.3.5_BMP
 //#define FREEIMUv04      // FreeIMU v0.4 with MPU6050, HMC5883L, MS561101BA                  <- confirmed by Alex
-//#define FREEIMUv043     // same as FREEIMUv04 with final MPU6050 (with the right ACC scale)
+#define FREEIMUv043     // same as FREEIMUv04 with final MPU6050 (with the right ACC scale)
 //#define PIPO            // 9DOF board from erazz
 //#define QUADRINO        // full FC board 9DOF+baro board from witespy  with BMP085 baro     <- confirmed by Alex
 //#define QUADRINO_ZOOM   // full FC board 9DOF+baro board from witespy  second edition       <- confirmed by Alex
@@ -477,7 +477,7 @@
    after the resistor divisor we should get [0V;5V]->[0;1023] on analog V_BATPIN
    with R1=33k and R2=51k
    vbat = [0;1023]*16/VBATSCALE */
-#define VBAT              // comment this line to suppress the vbat code
+//#define VBAT              // comment this line to suppress the vbat code
 #define VBATSCALE     58 //131 // change this value if readed Battery voltage is different than real voltage
 #define VBATLEVEL1_3S 107 // 10,7V
 #define VBATLEVEL2_3S 103 // 10,3V
