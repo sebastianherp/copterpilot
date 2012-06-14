@@ -14,9 +14,9 @@
   #define LEDPIN_OFF                 PORTB &= ~(1<<5);
   #define LEDPIN_ON                  PORTB |= (1<<5);
   #if !defined(RCAUXPIN8)
-    #define BUZZERPIN_PINMODE          pinMode (9, OUTPUT);
-    #define BUZZERPIN_ON               PORTB |= 2; // 1 for port 8
-    #define BUZZERPIN_OFF              PORTB &= ~2; // 1 for port 8
+    #define BUZZERPIN_PINMODE          pinMode (8, OUTPUT);
+    #define BUZZERPIN_ON               PORTB |= 1; // 1 for port 8
+    #define BUZZERPIN_OFF              PORTB &= ~1; // 1 for port 8
   #else
     #define BUZZERPIN_PINMODE          ;
     #define BUZZERPIN_ON               ;
@@ -54,8 +54,8 @@
   #define AUX3PIN                    1 // unused 
   #define AUX4PIN                    3 // unused 
   #define ISR_UART                   ISR(USART_UDRE_vect)
-  #define V_BATPIN                   A1    // Analog PIN 3
-  #define PSENSORPIN                 A0    // Analog PIN 2
+  #define V_BATPIN                   A3    // Analog PIN 3
+  #define PSENSORPIN                 A2    // Analog PIN 2
   
   #define SOFT_PWM_1_PIN_HIGH        PORTD |= 1<<4;    // pin d4 // rear right
   #define SOFT_PWM_1_PIN_LOW         PORTD &= ~(1<<4);
