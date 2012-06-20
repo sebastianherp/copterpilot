@@ -163,8 +163,8 @@
 /*************************************************************************************************/
 
   /********************************    TRI    *********************************/
-    #define YAW_DIRECTION 1 // if you want to reverse the yaw correction direction
-    //#define YAW_DIRECTION -1
+    //#define YAW_DIRECTION 1 // if you want to reverse the yaw correction direction
+    #define YAW_DIRECTION -1
     /* you can change the tricopter servo travel here */
       #define TRI_YAW_CONSTRAINT_MIN 1020
       #define TRI_YAW_CONSTRAINT_MAX 2000
@@ -403,7 +403,7 @@
          IF YOUR RECEIVER IS NOT CONCERNED, DON'T UNCOMMENT ANYTHING. Note this is mandatory for a Y6 setup on a promini
          Select the right line depending on your radio brand. Feel free to modify the order in your PPM order is different */
       //#define SERIAL_SUM_PPM         PITCH,YAW,THROTTLE,ROLL,AUX1,AUX2,AUX3,AUX4 //For Graupner/Spektrum
-      #define SERIAL_SUM_PPM         ROLL,PITCH,THROTTLE,YAW,AUX1,AUX2,AUX3,AUX4 //For Robe/Hitec/Futaba
+      #define SERIAL_SUM_PPM         ROLL,PITCH,THROTTLE,YAW,AUX4,AUX1,AUX2,AUX3 //For Robe/Hitec/Futaba
       //#define SERIAL_SUM_PPM         PITCH,ROLL,THROTTLE,YAW,AUX1,AUX2,AUX3,AUX4 //For some Hitec/Sanwa/Others
 
     /**********************    Spektrum Satellite Reciver    *******************************/
@@ -554,7 +554,7 @@
     #define NAV_TAIL_FIRST             false     // true - copter comes in with tail first 
     #define NAV_SET_TAKEOFF_HEADING    true      // true - when copter arrives to home position it rotates it's head to takeoff direction
     
-    #define MAG_DECLINIATION  3.96f              //For Budapest Hungary.
+    #define MAG_DECLINIATION  2.18f              //For Nuremberg, Germany.
     //Get your magnetic decliniation from here : http://magnetic-declination.com/
     //Convert the degree+minutes into decimal degree by ==> degree+minutes*(1/60)
     //Note the sign on declination it could be negative or positive (WEST or EAST)
@@ -671,7 +671,7 @@
        after the resistor divisor we should get [0V;5V]->[0;1023] on analog V_BATPIN
        with R1=33k and R2=51k
        vbat = [0;1023]*16/VBATSCALE */
-    //#define VBAT              // uncomment this line to activate the vbat code
+    #define VBAT              // uncomment this line to activate the vbat code
     #define VBATSCALE     131 // change this value if readed Battery voltage is different than real voltage
     #define VBATLEVEL1_3S 107 // 10,7V
     #define VBATLEVEL2_3S 103 // 10,3V
@@ -710,7 +710,7 @@
     /*      4. configure, compile, upload, set alarm value in GUI or LCD */
     /*      3. enjoy true readings of mAh consumed */
     /* set POWERMETER to "soft" (1) or "hard" (2) depending on sensor you want to utilize */
-    //#define POWERMETER_SOFT
+    #define POWERMETER_SOFT
     //#define POWERMETER_HARD
     /* the sum of all powermeters ranges from [0:60000 e4] theoretically. */
     /* the alarm level from eeprom is out of [0:255], so we multipy alarm level with PLEVELSCALE and with 1e4 before comparing */

@@ -147,11 +147,17 @@ typedef union {
 
 int16_t _atan2(float y, float x){
   #define fp_is_neg(val) ((((uint8_t*)&val)[3] & 0x80) != 0)
-  float z = y / x;
-  int16_t zi = abs(int16_t(z * 100)); 
   int8_t y_neg = fp_is_neg(y);
+  if(x == 0.0f) {
+    if(!y_neg) return 900; // PI/2
+    if(y == 0.0f) return 0;
+    return -900; // -PI/2;
+  }
+  float z = y / x;
+  int16_t zi = abs(int16_t(z * 100));
+  debug3 = zi;
   if ( zi < 100 ){
-    if (zi > 10) 
+    //if (zi > 10) 
      z = z / (1.0f + 0.28f * z * z);
    if (fp_is_neg(x)) {
      if (y_neg) z -= PI;
@@ -178,6 +184,7 @@ void getEstimatedAttitude(){
   int32_t accMag = 0;
   static t_fp_vector EstG;
 #if MAG
+  static t_fp_vector EstE;
   static t_fp_vector EstM;
 #endif
 #if defined(MG_LPF_FACTOR)
@@ -245,6 +252,14 @@ void getEstimatedAttitude(){
   angle[PITCH] =  _atan2(EstG.V.Y , EstG.V.Z) ;
 
   #if MAG
+    // Better algorithm
+    EstE.V.X = EstM.V.Y * EstG.V.Z - EstM.V.Z * EstG.V.Y;
+    EstE.V.Y = EstM.V.Z * EstG.V.X - EstM.V.X * EstG.V.Z;
+    EstE.V.Z = EstM.V.X * EstG.V.Y - EstM.V.Y * EstG.V.X;
+    
+    debug1 = EstE.V.X * 10;
+    debug2 = EstE.V.Y * 10;
+    
     // Attitude of the cross product vector GxM
     heading = _atan2( EstG.V.X * EstM.V.Z - EstG.V.Z * EstM.V.X , EstG.V.Z * EstM.V.Y - EstG.V.Y * EstM.V.Z  );
     heading += MAG_DECLINIATION * 10; //add declination
