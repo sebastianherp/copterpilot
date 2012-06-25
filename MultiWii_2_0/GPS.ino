@@ -294,6 +294,8 @@ void GPS_NewData() {
       GPS_directionToHome = 0;
       GPS_numSat = 0;
     }
+    debug1 = _i2c_gps_status;
+    debug2 = 123;
   #endif     
 
   #if defined(GPS_SERIAL) || defined(TINY_GPS)

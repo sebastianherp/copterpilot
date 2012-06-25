@@ -457,7 +457,7 @@
        Next, afrer FAILSAVE_OFF_DELAY the copter is disarmed, and motors is stopped.
        If RC pulse coming back before reached FAILSAVE_OFF_DELAY time, after the small quard time the RC control is returned to normal.
        If you use serial sum PPM, the sum converter must completly turn off the PPM SUM pusles for this FailSafe functionality.*/
-    //#define FAILSAFE                                  // uncomment  to activate the failsafe function
+    #define FAILSAFE                                  // uncomment  to activate the failsafe function
     #define FAILSAVE_DELAY     10                     // Guard time for failsafe activation after signal lost. 1 step = 0.1sec - 1sec in example
     #define FAILSAVE_OFF_DELAY 200                    // Time for Landing before motors stop in 0.1sec. 1 step = 0.1sec - 20sec in example
     #define FAILSAVE_THROTTLE  (MINTHROTTLE + 200)    // Throttle level used for landing - may be relative to MINTHROTTLE - as in this case
@@ -512,7 +512,7 @@
 
     /* introduce a deadband around the stick center
        Must be greater than zero, comment if you dont want a deadband on roll, pitch and yaw */
-    //#define DEADBAND 6
+    #define DEADBAND 6
 
 
   /**************************************************************************************/
@@ -541,9 +541,9 @@
        optional sonar device.
        https://github.com/wertarbyte/tiny-gps/ */
     /* get GPS data from Tiny-GPS */
-    //#define TINY_GPS
+    #define TINY_GPS
     /* get sonar data from Tiny-GPS */
-    //#define TINY_GPS_SONAR
+    #define TINY_GPS_SONAR
 
     /* GPS data readed from OSD -- still need some more code to work */
     //#define GPS_FROM_OSD
@@ -672,7 +672,7 @@
        with R1=33k and R2=51k
        vbat = [0;1023]*16/VBATSCALE */
     #define VBAT              // uncomment this line to activate the vbat code
-    #define VBATSCALE     131 // change this value if readed Battery voltage is different than real voltage
+    #define VBATSCALE     121 // change this value if readed Battery voltage is different than real voltage
     #define VBATLEVEL1_3S 107 // 10,7V
     #define VBATLEVEL2_3S 103 // 10,3V
     #define VBATLEVEL3_3S 99  // 9.9V
@@ -710,8 +710,8 @@
     /*      4. configure, compile, upload, set alarm value in GUI or LCD */
     /*      3. enjoy true readings of mAh consumed */
     /* set POWERMETER to "soft" (1) or "hard" (2) depending on sensor you want to utilize */
-    #define POWERMETER_SOFT
-    //#define POWERMETER_HARD
+    //#define POWERMETER_SOFT
+    #define POWERMETER_HARD
     /* the sum of all powermeters ranges from [0:60000 e4] theoretically. */
     /* the alarm level from eeprom is out of [0:255], so we multipy alarm level with PLEVELSCALE and with 1e4 before comparing */
     /* PLEVELSCALE is the step size you can use to set alarm */
