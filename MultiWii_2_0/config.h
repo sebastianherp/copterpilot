@@ -163,8 +163,8 @@
 /*************************************************************************************************/
 
   /********************************    TRI    *********************************/
-    //#define YAW_DIRECTION 1 // if you want to reverse the yaw correction direction
-    #define YAW_DIRECTION -1
+    #define YAW_DIRECTION 1 // if you want to reverse the yaw correction direction
+    //#define YAW_DIRECTION -1
     /* you can change the tricopter servo travel here */
       #define TRI_YAW_CONSTRAINT_MIN 1020
       #define TRI_YAW_CONSTRAINT_MAX 2000
