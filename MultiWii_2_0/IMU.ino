@@ -17,8 +17,8 @@ void computeIMU () {
     getEstimatedAttitude(); // computation time must last less than one interleaving delay
     while((micros()-timeInterleave)<INTERLEAVING_DELAY) ; //interleaving delay between 2 consecutive reads
     timeInterleave=micros();
-    nunchukData = 1;
-    while(nunchukData == 1) ACC_getADC(); // For this interleaving reading, we must have a gyro update at this point (less delay)
+    f.NUNCHUKDATA = 1;
+    while(f.NUNCHUKDATA) ACC_getADC(); // For this interleaving reading, we must have a gyro update at this point (less delay)
 
     for (axis = 0; axis < 3; axis++) {
       // empirical, we take a weighted value of the current and the previous values
@@ -147,16 +147,11 @@ typedef union {
 
 int16_t _atan2(float y, float x){
   #define fp_is_neg(val) ((((uint8_t*)&val)[3] & 0x80) != 0)
-  int8_t y_neg = fp_is_neg(y);
-  if(x == 0.0f) {
-    if(!y_neg) return 900; // PI/2
-    if(y == 0.0f) return 0;
-    return -900; // -PI/2;
-  }
   float z = y / x;
-  int16_t zi = abs(int16_t(z * 100));
+  int16_t zi = abs(int16_t(z * 100)); 
+  int8_t y_neg = fp_is_neg(y);
   if ( zi < 100 ){
-    //if (zi > 10) 
+    if (zi > 10) 
      z = z / (1.0f + 0.28f * z * z);
    if (fp_is_neg(x)) {
      if (y_neg) z -= PI;
@@ -227,15 +222,16 @@ void getEstimatedAttitude(){
     rotateV(&EstM.V,deltaGyroAngle);
   #endif 
 
-  if ( abs(accSmooth[ROLL])<acc_25deg && abs(accSmooth[PITCH])<acc_25deg && accSmooth[YAW]>0)
-    smallAngle25 = 1;
-  else
-    smallAngle25 = 0;
+  if ( abs(accSmooth[ROLL])<acc_25deg && abs(accSmooth[PITCH])<acc_25deg && accSmooth[YAW]>0) {
+    f.SMALL_ANGLES_25 = 1;
+  } else {
+    f.SMALL_ANGLES_25 = 0;
+  }
 
   // Apply complimentary filter (Gyro drift correction)
   // If accel magnitude >1.4G or <0.6G and ACC vector outside of the limit range => we neutralize the effect of accelerometers in the angle estimation.
   // To do that, we just skip filter, as EstV already rotated by Gyro
-  if ( ( 36 < accMag && accMag < 196 ) || smallAngle25 )
+  if ( ( 36 < accMag && accMag < 196 ) || f.SMALL_ANGLES_25 )
     for (axis = 0; axis < 3; axis++) {
       int16_t acc = ACC_VALUE;
       EstG.A[axis] = (EstG.A[axis] * GYR_CMPF_FACTOR + acc) * INV_GYR_CMPF_FACTOR;
@@ -246,18 +242,14 @@ void getEstimatedAttitude(){
   #endif
   
   // Attitude of the estimated vector
-  angle[ROLL]  =  _atan2(EstG.V.X , EstG.V.Z) ;
-  angle[PITCH] =  _atan2(EstG.V.Y , EstG.V.Z) ;
+  //angle[ROLL]  =  _atan2(EstG.V.X , EstG.V.Z) ;
+  //angle[PITCH] =  _atan2(EstG.V.Y , EstG.V.Z) ;
+
+  angle[ROLL]  =  _atan2(EstG.V.X , sqrt(EstG.V.Y*EstG.V.Y + EstG.V.Z*EstG.V.Z)) ;
+  angle[PITCH] =  _atan2(EstG.V.Y , sqrt(EstG.V.X*EstG.V.X + EstG.V.Z*EstG.V.Z)) ;
+
 
   #if MAG
-    // Better algorithm
-    //EstE.V.X = EstM.V.Y * EstG.V.Z - EstM.V.Z * EstG.V.Y;
-    //EstE.V.Y = EstM.V.Z * EstG.V.X - EstM.V.X * EstG.V.Z;
-    //EstE.V.Z = EstM.V.X * EstG.V.Y - EstM.V.Y * EstG.V.X;
-    
-    //debug1 = EstE.V.X * 10;
-    //debug2 = EstE.V.Y * 10;
-    
     // Attitude of the cross product vector GxM
     heading = _atan2( EstG.V.X * EstM.V.Z - EstG.V.Z * EstM.V.X , EstG.V.Z * EstM.V.Y - EstG.V.Y * EstM.V.Z  );
     heading += MAG_DECLINIATION * 10; //add declination
@@ -280,7 +272,7 @@ void getEstimatedAltitude(){
   static int32_t BaroHigh,BaroLow;
   int32_t temp32;
   int16_t last;
-  
+
   if (currentTime < deadLine) return;
   deadLine = currentTime + UPDATE_INTERVAL; 
 
